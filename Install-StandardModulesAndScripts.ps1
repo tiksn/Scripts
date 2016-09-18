@@ -1,11 +1,13 @@
 ﻿# Modules
 Install-Module -Name Carbon -Force
+Install-Module -Name Git-PsRadar -Force
 Install-Module -Name CredentialManager -Force
 Install-Module -Name GroceryChecklistToolkit -Force
 Install-Module -Name Microsoft.PowerShell.Archive -Force
 Install-Module -Name Microsoft.WindowsPassportUtilities.Commands -Force
 Install-Module -Name MlkPwgen -Force
 Install-Module -Name NTFSSecurity -Force
+Install-Module -Name PSGit -Force
 Install-Module -Name Pscx -Force
 Install-Module -Name PSScriptAnalyzer -Force
 Install-Module -Name PSWindowsUpdate -Force
