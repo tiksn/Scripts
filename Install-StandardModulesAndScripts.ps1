@@ -1,6 +1,6 @@
 ﻿# Modules
 Install-Module -Name Carbon -Force
-Install-Module -Name Git-PsRadar -Force
+# Install-Module -Name Git-PsRadar -Force
 Install-Module -Name CredentialManager -Force
 Install-Module -Name GroceryChecklistToolkit -Force
 Install-Module -Name Microsoft.PowerShell.Archive -Force
@@ -21,4 +21,5 @@ Install-Module -Name TIKSN-PowerShell-Cmdlets -Force
 Install-Module -Name WintellectPowerShell -Force
 
 # Scripts
+Install-Script -Name Update-PowerShell -Force
 Install-Script -Name Update-Windows -Force
