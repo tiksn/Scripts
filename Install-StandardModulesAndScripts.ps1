@@ -1,6 +1,5 @@
 ﻿# Modules
 Install-Module -Name Carbon -Force
-# Install-Module -Name Git-PsRadar -Force
 Install-Module -Name CredentialManager -Force
 Install-Module -Name GroceryChecklistToolkit -Force
 Install-Module -Name Microsoft.PowerShell.Archive -Force
