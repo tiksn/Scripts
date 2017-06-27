@@ -1,5 +1,6 @@
 @echo off
 
+choco install cmdermini
 choco install grocery-checklist-shell
 choco install nuget.commandline
 choco install scriptcs
