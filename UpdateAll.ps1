@@ -1,21 +1,35 @@
-﻿<#	
-	.NOTES
-	===========================================================================
-	 Created with: 	SAPIEN Technologies, Inc., PowerShell Studio 2017 v5.4.144
-	 Created on:   	10/3/2017 12:23 PM
-	 Created by:   	Tigran Torosyan
-	 Organization: 	
-	 Filename:     	
-	===========================================================================
+﻿<#
+	.SYNOPSIS
+		A brief description of the UpdateAll.ps1 file.
+	
 	.DESCRIPTION
 		A description of the file.
+	
+	.PARAMETER Setup
+		A description of the Setup parameter.
+	
+	.NOTES
+		===========================================================================
+		Created with: 	SAPIEN Technologies, Inc., PowerShell Studio 2017 v5.4.144
+		Created on:   	10/3/2017 12:23 PM
+		Created by:   	Tigran Torosyan
+		Organization:
+		Filename:
+		===========================================================================
 #>
+param
+(
+	[switch]$Setup
+)
 
-Write-Host 'Setup'
-
-Install-Script -Name Update-PowerShell
-Install-Script -Name Update-Windows
-Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+if ($Setup.IsPresent)
+{
+	Write-Host 'Setup'
+	
+	Install-Script -Name Update-PowerShell
+	Install-Script -Name Update-Windows
+	Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+}
 
 Write-Host 'Updating PowerShell'
 Update-PowerShell
