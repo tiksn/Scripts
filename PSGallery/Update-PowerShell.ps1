@@ -32,14 +32,24 @@
 
 #Requires -Module PowerShellGet
 
-<# 
+<#
+	.SYNOPSIS
+		A brief description of the Update-PowerShell.ps1 file.
+	
+	.DESCRIPTION
+		Updates PowerShell scripts, modules and help
+	
+	.PARAMETER Verbose
+		A description of the Verbose parameter.
+	
+	.NOTES
+		Additional information about the file.
+#>
+param
+(
+	[switch]$Verbose
+)
 
-.DESCRIPTION 
- Updates PowerShell scripts, modules and help
-
-#> 
-Param()
-
-Update-Module
-Update-Script
+Update-Module -Verbose:$Verbose
+Update-Script -Verbose:$Verbose
 Update-Help
