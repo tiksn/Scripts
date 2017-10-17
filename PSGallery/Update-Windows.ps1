@@ -1,4 +1,4 @@
-﻿
+
 <#PSScriptInfo
 
 .VERSION 1.1.0.0
@@ -32,6 +32,7 @@
 
 #Requires -Module PSWindowsUpdate
 
+
 <#
 	.SYNOPSIS
 		A brief description of the Update-Windows.ps1 file.
@@ -44,9 +45,6 @@
 	
 	.PARAMETER Verbose
 		A description of the Verbose parameter.
-	
-	.PARAMETER Silent
-		A description of the Silent parameter.
 	
 	.NOTES
 		Additional information about the file.
