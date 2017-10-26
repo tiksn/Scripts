@@ -38,7 +38,7 @@ Write-Host 'Updating the antimalware definitions on a computer'
 Update-MpSignature
 
 Write-Host 'Updating Windows'
-Update-Windows
+Update-Windows -AcceptAll
 
 Write-Host 'Updating Chocolatey packages'
 choco upgrade --confirm all
