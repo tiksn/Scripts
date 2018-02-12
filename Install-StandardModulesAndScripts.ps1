@@ -8,6 +8,7 @@ Install-Module -Name MlkPwgen -Force
 Install-Module -Name NTFSSecurity -Force
 Install-Module -Name PSGit -Force
 Install-Module -Name Pscx -Force
+Install-Module -Name PSLiteDB -Force
 Install-Module -Name PSScriptAnalyzer -Force
 Install-Module -Name PSWindowsUpdate -Force
 Install-Module -Name posh-git -Force
