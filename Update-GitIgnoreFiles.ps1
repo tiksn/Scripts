@@ -9,15 +9,15 @@ Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination ..\Sc
 Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination ..\TIKSN-Exchange\.gitignore -Confirm
 Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination ..\TIKSN-Framework\.gitignore -Confirm
 
-Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\Console Screen\.gitignore' -Confirm
-Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\CrashCourse Lessons\.gitignore' -Confirm
-Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\CSV Converter\.gitignore' -Confirm
-Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\Locale Graph\.gitignore' -Confirm
-Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\PenPalsNow Parser\.gitignore' -Confirm
-Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\Terminology Translator\.gitignore' -Confirm
-Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\TIKSN Blog\.gitignore' -Confirm
-Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\UkrGoCommander\.gitignore' -Confirm
-Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\Ամեն ինչի մասին\Code\.gitignore' -Confirm
+Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\tiksn\Console Screen\.gitignore' -Confirm
+Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\tiksn\CrashCourse Lessons\.gitignore' -Confirm
+Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\tiksn\CSV Converter\.gitignore' -Confirm
+Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\tiksn\Locale Graph\.gitignore' -Confirm
+Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\tiksn\PenPalsNow Parser\.gitignore' -Confirm
+Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\tiksn\Terminology Translator\.gitignore' -Confirm
+Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\tiksn\TIKSN Blog\.gitignore' -Confirm
+Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\tiksn\UkrGoCommander\.gitignore' -Confirm
+Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination '..\..\..\Bitbucket\tiksn\Ամեն ինչի մասին\Code\.gitignore' -Confirm
 
 Copy-Item -Path ..\..\github\gitignore\VisualStudio.gitignore -Destination ..\..\..\GitLab\tiksn\economics-and-finance\.gitignore -Confirm
 
