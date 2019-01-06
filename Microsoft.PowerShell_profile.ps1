@@ -1,3 +1,4 @@
 function prompt {
-    "[$((Get-Date | Out-String).trim())] PS $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) ";
+    $formattedDate = (Get-Date).ToString("f");
+    "PSC [$(($formattedDate | Out-String).trim())] $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) ";
 }
