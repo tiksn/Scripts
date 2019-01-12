@@ -6,6 +6,7 @@ $PackagePaths = @()
 
 $PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "tiksn-framework"
 $PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "tiksn-cake"
+$PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "tiksn-habitica"
 
 foreach($PackagePath in $PackagePaths) {
     if (Test-Path -Path $PackagePath) {
