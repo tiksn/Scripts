@@ -2,7 +2,7 @@ Import-Module ObjectiveGit
 Import-Module posh-git
 
 $formattedDate = (Get-Date).ToString("f")
-$formattedDate = " $(($formattedDate | Out-String).trim()) "
+$formattedDate = "⌚ $(($formattedDate | Out-String).trim()) ⌚"
 
 Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlue
 
@@ -12,8 +12,8 @@ $rates = $xml.exchange | Select-Object -ExpandProperty currency
 $usduah = $rates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_,2) }
 $euruah = $rates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_,2) }
 
-Write-Host -Object " USD/UAH $usduah" -BackgroundColor Black -ForegroundColor DarkGreen
-Write-Host -Object " EUR/UAH $euruah" -BackgroundColor Black -ForegroundColor DarkGreen
+Write-Host -Object "💵 USD/UAH $usduah 💵" -BackgroundColor Black -ForegroundColor DarkGreen
+Write-Host -Object "💶 EUR/UAH $euruah 💶" -BackgroundColor Black -ForegroundColor DarkGreen
 
 function prompt {
     $formattedTime = (Get-Date).ToShortTimeString()
