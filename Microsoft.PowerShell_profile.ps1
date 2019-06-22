@@ -1,13 +1,29 @@
 Import-Module ObjectiveGit
 Import-Module posh-git
 
+$formattedDate = (Get-Date).ToString("f")
+$formattedDate = " $(($formattedDate | Out-String).trim()) "
+
+Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlue
+
+$xml = New-Object xml
+$xml.Load('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange')
+$rates = $xml.exchange | Select-Object -ExpandProperty currency
+$usduah = $rates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_,2) }
+$euruah = $rates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_,2) }
+
+Write-Host -Object " USD/UAH $usduah" -BackgroundColor Black -ForegroundColor DarkGreen
+Write-Host -Object " EUR/UAH $euruah" -BackgroundColor Black -ForegroundColor DarkGreen
+
 function prompt {
-    $formattedDate = (Get-Date).ToString("f");
-    $formattedDate = "[$(($formattedDate | Out-String).trim())]";
+    $formattedTime = (Get-Date).ToShortTimeString()
+    # $formattedTime = "[$(($formattedDate | Out-String).trim())]"
     Try
     {
         $repoStatus = Get-RepositoryStatus;
         Write-Host -Object "GIT" -NoNewline -BackgroundColor Yellow -ForegroundColor Red
+        Write-Host -Object " " -NoNewline
+        Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor DarkBlue
         Write-Host -Object " " -NoNewline
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
         Write-VcsStatus
@@ -18,6 +34,8 @@ function prompt {
     {
         $repoStatus = $null;
         Write-Host -Object "PSC" -NoNewline -BackgroundColor Yellow -ForegroundColor Red
+        Write-Host -Object " " -NoNewline
+        Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor DarkBlue
         Write-Host -Object " " -NoNewline
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
         Write-Host
