@@ -45,7 +45,11 @@ function prompt {
     return " "
 }
 
-$PowerShellTranscriptsPath = Join-Path -Path $env:userprofile -ChildPath "PowerShellTranscripts"
+if ($IsWindows) {
+    $PowerShellTranscriptsPath = Join-Path -Path $env:userprofile -ChildPath "PowerShellTranscripts"
+} elseif ($IsLinux) {
+    $PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath "PowerShellTranscripts"
+}
 
 if (-not (Test-Path -Path $PowerShellTranscriptsPath)) {
     New-Item -Path $PowerShellTranscriptsPath -ItemType Directory
