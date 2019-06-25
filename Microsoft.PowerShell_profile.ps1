@@ -6,6 +6,22 @@ $formattedDate = "⌚ $(($formattedDate | Out-String).trim()) ⌚"
 
 Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlue
 
+function GetSignedChange {
+    param (
+        $change
+    )
+    
+    if ($change -gt 0) {
+        return "+$change"
+    }
+    elseif ($change -lt 0) {
+        return $change.ToString()
+    }
+    else {
+        return " $change"
+    }
+}
+
 function GetCurrencyFluctuation {
     param (
         $total,
@@ -24,17 +40,8 @@ function GetCurrencyFluctuation {
 
     $percentage = ($delta * 100) / $total
     $percentage = [math]::Round($percentage, 2)
-
-    if ($percentage -gt 0) {
-        $percentage = "+$percentage"
-    }
-    elseif ($percentage -lt 0) {
-        $percentage = $percentage.ToString()
-    }
-    else {
-        $percentage = " $percentage"
-    }
-
+    
+    $percentage = GetSignedChange( $percentage )
     $percentage = "$percentage%"
     return New-Object PSObject -Property @{
         Sign       = $sign
@@ -60,8 +67,11 @@ $euruahDelta = $euruahToday - $euruahYesterday
 $usduahFluctuation = GetCurrencyFluctuation -total $usduahToday -delta $usduahDelta
 $euruahFluctuation = GetCurrencyFluctuation -total $euruahToday -delta $euruahDelta
 
-Write-Host -Object "💵 USD/UAH $usduahToday $($usduahFluctuation.Sign) $($usduahFluctuation.Percentage) 💵" -BackgroundColor Black -ForegroundColor DarkGreen
-Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euruahFluctuation.Percentage) 💶" -BackgroundColor Black -ForegroundColor DarkGreen
+$usduahDelta = GetSignedChange ( [math]::Round($usduahDelta, 2) )
+$euruahDelta = GetSignedChange ( [math]::Round($euruahDelta, 2) )
+
+Write-Host -Object "💵 USD/UAH $usduahToday $($usduahFluctuation.Sign) $($usduahFluctuation.Percentage) ($usduahDelta) 💵" -BackgroundColor Black -ForegroundColor DarkGreen
+Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euruahFluctuation.Percentage) ($euruahDelta) 💶" -BackgroundColor Black -ForegroundColor DarkGreen
 
 function prompt {
     $formattedTime = (Get-Date).ToShortTimeString()
