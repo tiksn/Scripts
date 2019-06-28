@@ -73,6 +73,21 @@ $euruahDelta = GetSignedChange ( [math]::Round($euruahDelta, 2) )
 Write-Host -Object "💵 USD/UAH $usduahToday $($usduahFluctuation.Sign) $($usduahFluctuation.Percentage) ($usduahDelta) 💵" -BackgroundColor Black -ForegroundColor DarkGreen
 Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euruahFluctuation.Percentage) ($euruahDelta) 💶" -BackgroundColor Black -ForegroundColor DarkGreen
 
+$habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
+Connect-Habitica -Path $habiticaCredentialsFilePath
+
+$dueDailiesCount = (Get-HabiticaTask -Type dailys | Where-Object { $_.IsDue } | Measure-Object).Count
+$dueToDoCount = (Get-HabiticaTask -Type todos | Measure-Object).Count
+$dueHabitCount = (Get-HabiticaTask -Type habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) } | Measure-Object).Count
+
+Write-Host -Object "⚒ " -NoNewline
+Write-Host -Object $dueHabitCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object " Habits (inacted) " -NoNewline
+Write-Host -Object $dueDailiesCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object " Dailies (due) " -NoNewline
+Write-Host -Object $dueToDoCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object " To-Dos (due) ⚒"
+
 function prompt {
     $formattedTime = (Get-Date).ToShortTimeString()
     # $formattedTime = "[$(($formattedDate | Out-String).trim())]"
