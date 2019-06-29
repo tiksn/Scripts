@@ -79,14 +79,24 @@ Connect-Habitica -Path $habiticaCredentialsFilePath
 $dueDailiesCount = (Get-HabiticaTask -Type dailys | Where-Object { $_.IsDue -and (-not $_.completed) } | Measure-Object).Count
 $dueToDoCount = (Get-HabiticaTask -Type todos | Measure-Object).Count
 $dueHabitCount = (Get-HabiticaTask -Type habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) } | Measure-Object).Count
+$habiticaUser =  Get-HabiticaUser
 
 Write-Host -Object "⚒ " -NoNewline
+Write-Host -Object (Get-Culture).TextInfo.ToTitleCase($habiticaUser.stats.class) -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object " Class " -NoNewline
+Write-Host -Object $habiticaUser.stats.lvl -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object " Level " -NoNewline
+Write-Host -Object ([math]::Round($habiticaUser.stats.gp)) -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object " Gold " -NoNewline
 Write-Host -Object $dueHabitCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
 Write-Host -Object " Habits (inacted) " -NoNewline
 Write-Host -Object $dueDailiesCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
 Write-Host -Object " Dailies (due) " -NoNewline
 Write-Host -Object $dueToDoCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
 Write-Host -Object " To-Dos (due) ⚒"
+
+
+
 
 function prompt {
     $formattedTime = (Get-Date).ToShortTimeString()
