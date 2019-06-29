@@ -76,7 +76,7 @@ Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euru
 $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
 Connect-Habitica -Path $habiticaCredentialsFilePath
 
-$dueDailiesCount = (Get-HabiticaTask -Type dailys | Where-Object { $_.IsDue } | Measure-Object).Count
+$dueDailiesCount = (Get-HabiticaTask -Type dailys | Where-Object { $_.IsDue -and (-not $_.completed) } | Measure-Object).Count
 $dueToDoCount = (Get-HabiticaTask -Type todos | Measure-Object).Count
 $dueHabitCount = (Get-HabiticaTask -Type habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) } | Measure-Object).Count
 
