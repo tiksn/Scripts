@@ -86,14 +86,14 @@ Write-Host -Object (Get-Culture).TextInfo.ToTitleCase($habiticaUser.stats.class)
 Write-Host -Object " Class " -NoNewline
 Write-Host -Object $habiticaUser.stats.lvl -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
 Write-Host -Object " Level " -NoNewline
-Write-Host -Object ([math]::Round($habiticaUser.stats.gp)) -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object ($habiticaUser.stats.gp.ToString("N2")) -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
 Write-Host -Object " Gold " -NoNewline
 Write-Host -Object $dueHabitCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
 Write-Host -Object " Habits (inacted) " -NoNewline
 Write-Host -Object $dueDailiesCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-Write-Host -Object " Dailies (due) " -NoNewline
+Write-Host -Object " Dailies (left) " -NoNewline
 Write-Host -Object $dueToDoCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-Write-Host -Object " To-Dos (due) ⚒"
+Write-Host -Object " To-Dos ⚒"
 
 
 
