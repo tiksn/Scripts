@@ -98,7 +98,7 @@ Write-Host -Object " To-Dos ⚒"
 
 $release = Get-PSReleaseCurrent
 
-if (($release.Version -ne $release.LocalVersion) -and ($release.Version -ne "v$release.LocalVersion")) {
+if (($release.Version -ne $release.LocalVersion) -and ($release.Version -ne "v$($release.LocalVersion)")) {
     Write-Host -Object "🆕 New " -NoNewline -BackgroundColor White -ForegroundColor Black
     Write-Host -Object $release.Version -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
     Write-Host -Object " version is available 🆕" -BackgroundColor White -ForegroundColor Black
