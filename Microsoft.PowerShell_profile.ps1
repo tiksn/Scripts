@@ -6,72 +6,72 @@ $formattedDate = "⌚ $(($formattedDate | Out-String).trim()) ⌚"
 
 Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlue
 
-function GetSignedChange {
-    param (
-        $change
-    )
+# function GetSignedChange {
+#     param (
+#         $change
+#     )
     
-    if ($change -gt 0) {
-        return "+$change"
-    }
-    elseif ($change -lt 0) {
-        return $change.ToString()
-    }
-    else {
-        return " $change"
-    }
-}
+#     if ($change -gt 0) {
+#         return "+$change"
+#     }
+#     elseif ($change -lt 0) {
+#         return $change.ToString()
+#     }
+#     else {
+#         return " $change"
+#     }
+# }
 
-function GetCurrencyFluctuation {
-    param (
-        $total,
-        $delta
-    )
+# function GetCurrencyFluctuation {
+#     param (
+#         $total,
+#         $delta
+#     )
     
-    if ($delta -gt 0) {
-        $sign = "🔼"
-    }
-    elseif ($delta -lt 0) {
-        $sign = "🔽"
-    }
-    else {
-        $sign = "≡"
-    }
+#     if ($delta -gt 0) {
+#         $sign = "🔼"
+#     }
+#     elseif ($delta -lt 0) {
+#         $sign = "🔽"
+#     }
+#     else {
+#         $sign = "≡"
+#     }
 
-    $percentage = ($delta * 100) / $total
-    $percentage = [math]::Round($percentage, 2)
+#     $percentage = ($delta * 100) / $total
+#     $percentage = [math]::Round($percentage, 2)
     
-    $percentage = GetSignedChange( $percentage )
-    $percentage = "$percentage%"
-    return New-Object PSObject -Property @{
-        Sign       = $sign
-        Percentage = $percentage
-    }
-}
-$xml = New-Object xml
-$xml.Load('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange')
-$rates = $xml.exchange | Select-Object -ExpandProperty currency
-$usduahToday = $rates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
-$euruahToday = $rates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
+#     $percentage = GetSignedChange( $percentage )
+#     $percentage = "$percentage%"
+#     return New-Object PSObject -Property @{
+#         Sign       = $sign
+#         Percentage = $percentage
+#     }
+# }
+# $xml = New-Object xml
+# $xml.Load('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange')
+# $rates = $xml.exchange | Select-Object -ExpandProperty currency
+# $usduahToday = $rates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
+# $euruahToday = $rates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
 
-$yesterdaysDatePattern = (Get-Date).AddDays(-1).ToString("yyyyMMdd")
+# $yesterdaysDatePattern = (Get-Date).AddDays(-1).ToString("yyyyMMdd")
 
-$xml.Load("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=$yesterdaysDatePattern")
-$rates = $xml.exchange | Select-Object -ExpandProperty currency
-$usduahYesterday = $rates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
-$euruahYesterday = $rates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
+# $xml.Load("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=$yesterdaysDatePattern")
+# $rates = $xml.exchange | Select-Object -ExpandProperty currency
+# $usduahYesterday = $rates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
+# $euruahYesterday = $rates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
 
-$usduahDelta = $usduahToday - $usduahYesterday
-$euruahDelta = $euruahToday - $euruahYesterday
+# $usduahDelta = $usduahToday - $usduahYesterday
+# $euruahDelta = $euruahToday - $euruahYesterday
 
-$usduahFluctuation = GetCurrencyFluctuation -total $usduahToday -delta $usduahDelta
-$euruahFluctuation = GetCurrencyFluctuation -total $euruahToday -delta $euruahDelta
+# $usduahFluctuation = GetCurrencyFluctuation -total $usduahToday -delta $usduahDelta
+# $euruahFluctuation = GetCurrencyFluctuation -total $euruahToday -delta $euruahDelta
 
-$usduahDelta = GetSignedChange ( [math]::Round($usduahDelta, 2) )
-$euruahDelta = GetSignedChange ( [math]::Round($euruahDelta, 2) )
+# $usduahDelta = GetSignedChange ( [math]::Round($usduahDelta, 2) )
+# $euruahDelta = GetSignedChange ( [math]::Round($euruahDelta, 2) )
 
-Write-Host -Object "💵 USD/UAH $usduahToday $($usduahFluctuation.Sign) $($usduahFluctuation.Percentage) ($usduahDelta) 💵" -BackgroundColor Black -ForegroundColor DarkGreen
-Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euruahFluctuation.Percentage) ($euruahDelta) 💶" -BackgroundColor Black -ForegroundColor DarkGreen
+# Write-Host -Object "💵 USD/UAH $usduahToday $($usduahFluctuation.Sign) $($usduahFluctuation.Percentage) ($usduahDelta) 💵" -BackgroundColor Black -ForegroundColor DarkGreen
+# Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euruahFluctuation.Percentage) ($euruahDelta) 💶" -BackgroundColor Black -ForegroundColor DarkGreen
 
 $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
 Connect-Habitica -Path $habiticaCredentialsFilePath
