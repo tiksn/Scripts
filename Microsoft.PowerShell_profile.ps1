@@ -1,5 +1,6 @@
-Import-Module ObjectiveGit
-Import-Module posh-git
+Import-Module -Name ObjectiveGit
+Import-Module -Name posh-git
+Import-Module -Name Habitica
 
 $formattedDate = (Get-Date).ToString("f")
 $formattedDate = "⌚ $(($formattedDate | Out-String).trim()) ⌚"
@@ -10,7 +11,7 @@ Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlu
 #     param (
 #         $change
 #     )
-    
+
 #     if ($change -gt 0) {
 #         return "+$change"
 #     }
@@ -27,7 +28,7 @@ Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlu
 #         $total,
 #         $delta
 #     )
-    
+
 #     if ($delta -gt 0) {
 #         $sign = "🔼"
 #     }
@@ -40,7 +41,7 @@ Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlu
 
 #     $percentage = ($delta * 100) / $total
 #     $percentage = [math]::Round($percentage, 2)
-    
+
 #     $percentage = GetSignedChange( $percentage )
 #     $percentage = "$percentage%"
 #     return New-Object PSObject -Property @{
