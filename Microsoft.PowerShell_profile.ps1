@@ -7,59 +7,83 @@ $formattedDate = "⌚ $(($formattedDate | Out-String).trim()) ⌚"
 
 Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlue
 
-$PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
+$PowerShellCachePath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
 
-if (Test-Path -Path $PowerShellTranscriptsPath) {
-    $ProfileCache = ConvertFrom-Json -InputObject (Get-Content -Path $PowerShellTranscriptsPath -Raw)
-} else {
-    $ProfileCache = $null
+if (Test-Path -Path $PowerShellCachePath) {
+    $ProfileCache = Import-Clixml -Path $PowerShellCachePath
+}
+else {
+    $ProfileCache = [PSCustomObject]@{
+        Release       = $null
+        Saved         = $null
+        ExchangeRates = $null
+    }
 }
 
-# function GetSignedChange {
-#     param (
-#         $change
-#     )
+function GetSignedChange {
+    param (
+        $change
+    )
 
-#     if ($change -gt 0) {
-#         return "+$change"
-#     }
-#     elseif ($change -lt 0) {
-#         return $change.ToString()
-#     }
-#     else {
-#         return " $change"
-#     }
-# }
+    if ($change -gt 0) {
+        return "+$change"
+    }
+    elseif ($change -lt 0) {
+        return $change.ToString()
+    }
+    else {
+        return " $change"
+    }
+}
 
-# function GetCurrencyFluctuation {
-#     param (
-#         $total,
-#         $delta
-#     )
+function GetCurrencyFluctuation {
+    param (
+        $total,
+        $delta
+    )
 
-#     if ($delta -gt 0) {
-#         $sign = "🔼"
-#     }
-#     elseif ($delta -lt 0) {
-#         $sign = "🔽"
-#     }
-#     else {
-#         $sign = "≡"
-#     }
+    if ($delta -gt 0) {
+        $sign = "🔼"
+    }
+    elseif ($delta -lt 0) {
+        $sign = "🔽"
+    }
+    else {
+        $sign = "≡"
+    }
 
-#     $percentage = ($delta * 100) / $total
-#     $percentage = [math]::Round($percentage, 2)
+    $percentage = ($delta * 100) / $total
+    $percentage = [math]::Round($percentage, 2)
 
-#     $percentage = GetSignedChange( $percentage )
-#     $percentage = "$percentage%"
-#     return New-Object PSObject -Property @{
-#         Sign       = $sign
-#         Percentage = $percentage
-#     }
-# }
-# $xml = New-Object xml
-# $xml.Load('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange')
-# $rates = $xml.exchange | Select-Object -ExpandProperty currency
+    $percentage = GetSignedChange( $percentage )
+    $percentage = "$percentage%"
+    return New-Object PSObject -Property @{
+        Sign       = $sign
+        Percentage = $percentage
+    }
+}
+
+if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
+    $ProfileCache.Release = Get-PSReleaseCurrent
+    $ProfileCache.Saved = Get-Date
+
+    $SaveCache = $true
+
+    try {
+        $xml = New-Object xml
+        $xml.Load('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange')
+        $ProfileCache.ExchangeRates = $xml.exchange | Select-Object -ExpandProperty currency
+    }
+    catch {
+        $SaveCache = $false
+    }
+
+    if ($SaveCache) {
+        $ProfileCache | Export-Clixml $PowerShellCachePath
+    }
+}
+
+# $rates =
 # $usduahToday = $rates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
 # $euruahToday = $rates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
 
@@ -105,11 +129,9 @@ if (Test-Path -Path $PowerShellTranscriptsPath) {
 # Write-Host -Object " To-Dos ⚒"
 
 
-$release = Get-PSReleaseCurrent
-
-if (($release.Version -ne $release.LocalVersion) -and ($release.Version -ne "v$($release.LocalVersion)")) {
+if (($ProfileCache.Release.Version -ne $ProfileCache.Release.LocalVersion) -and ($ProfileCache.Release.Version -ne "v$($ProfileCache.Release.LocalVersion)")) {
     Write-Host -Object "🆕 New " -NoNewline -BackgroundColor White -ForegroundColor Black
-    Write-Host -Object $release.Version -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+    Write-Host -Object $ProfileCache.Release.Version -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
     Write-Host -Object " version is available 🆕" -BackgroundColor White -ForegroundColor Black
 }
 
