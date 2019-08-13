@@ -7,6 +7,14 @@ $formattedDate = "⌚ $(($formattedDate | Out-String).trim()) ⌚"
 
 Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlue
 
+$PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
+
+if (Test-Path -Path $PowerShellTranscriptsPath) {
+    $ProfileCache = ConvertFrom-Json -InputObject (Get-Content -Path $PowerShellTranscriptsPath -Raw)
+} else {
+    $ProfileCache = $null
+}
+
 # function GetSignedChange {
 #     param (
 #         $change
