@@ -18,6 +18,12 @@ else {
         Saved                   = $null
         ExchangeRates           = $null
         YesterdaysExchangeRates = $null
+        Habitica                = [PSCustomObject]@{
+            DueDailiesCount = $null
+            DueToDoCount    = $null
+            DueHabitCount   = $null
+            HabiticaUser    = $null
+        }
     }
 }
 
@@ -83,6 +89,18 @@ if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Save
         $SaveCache = $false
     }
 
+    try {
+        $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
+        Connect-Habitica -Path $habiticaCredentialsFilePath
+
+        $ProfileCache.Habitica.DueDailiesCount = (Get-HabiticaTask -Type dailys | Where-Object { $_.IsDue -and (-not $_.completed) } | Measure-Object).Count
+        $ProfileCache.Habitica.DueToDoCount = (Get-HabiticaTask -Type todos | Measure-Object).Count
+        $ProfileCache.Habitica.DueHabitCount = (Get-HabiticaTask -Type habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) } | Measure-Object).Count
+        $ProfileCache.Habitica.HabiticaUser = Get-HabiticaUser
+    }
+    catch {
+        $SaveCache = $false
+    }
     if ($SaveCache) {
         $ProfileCache | Export-Clixml $PowerShellCachePath
     }
@@ -108,27 +126,20 @@ $euruahDelta = GetSignedChange ( [math]::Round($euruahDelta, 2) )
 Write-Host -Object "💵 USD/UAH $usduahToday $($usduahFluctuation.Sign) $($usduahFluctuation.Percentage) ($usduahDelta) 💵" -BackgroundColor Black -ForegroundColor DarkGreen
 Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euruahFluctuation.Percentage) ($euruahDelta) 💶" -BackgroundColor Black -ForegroundColor DarkGreen
 
-# $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
-# Connect-Habitica -Path $habiticaCredentialsFilePath
 
-# $dueDailiesCount = (Get-HabiticaTask -Type dailys | Where-Object { $_.IsDue -and (-not $_.completed) } | Measure-Object).Count
-# $dueToDoCount = (Get-HabiticaTask -Type todos | Measure-Object).Count
-# $dueHabitCount = (Get-HabiticaTask -Type habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) } | Measure-Object).Count
-# $habiticaUser =  Get-HabiticaUser
-
-# Write-Host -Object "⚒ " -NoNewline
-# Write-Host -Object (Get-Culture).TextInfo.ToTitleCase($habiticaUser.stats.class) -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-# Write-Host -Object " Class " -NoNewline
-# Write-Host -Object $habiticaUser.stats.lvl -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-# Write-Host -Object " Level " -NoNewline
-# Write-Host -Object ($habiticaUser.stats.gp.ToString("N2")) -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-# Write-Host -Object " Gold " -NoNewline
-# Write-Host -Object $dueHabitCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-# Write-Host -Object " Habits (inacted) " -NoNewline
-# Write-Host -Object $dueDailiesCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-# Write-Host -Object " Dailies (left) " -NoNewline
-# Write-Host -Object $dueToDoCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-# Write-Host -Object " To-Dos ⚒"
+Write-Host -Object "⚒ " -NoNewline
+Write-Host -Object (Get-Culture).TextInfo.ToTitleCase($ProfileCache.Habitica.HabiticaUser.stats.class) -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object " Class " -NoNewline
+Write-Host -Object $ProfileCache.Habitica.HabiticaUser.stats.lvl -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object " Level " -NoNewline
+Write-Host -Object ($ProfileCache.Habitica.HabiticaUser.stats.gp.ToString("N2")) -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object " Gold " -NoNewline
+Write-Host -Object $ProfileCache.Habitica.DueHabitCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object " Habits (inacted) " -NoNewline
+Write-Host -Object $ProfileCache.Habitica.DueDailiesCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object " Dailies (left) " -NoNewline
+Write-Host -Object $ProfileCache.Habitica.DueToDoCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object " To-Dos ⚒"
 
 
 if (($ProfileCache.Release.Version -ne $ProfileCache.Release.LocalVersion) -and ($ProfileCache.Release.Version -ne "v$($ProfileCache.Release.LocalVersion)")) {
