@@ -14,9 +14,10 @@ if (Test-Path -Path $PowerShellCachePath) {
 }
 else {
     $ProfileCache = [PSCustomObject]@{
-        Release       = $null
-        Saved         = $null
-        ExchangeRates = $null
+        Release                 = $null
+        Saved                   = $null
+        ExchangeRates           = $null
+        YesterdaysExchangeRates = $null
     }
 }
 
@@ -71,8 +72,12 @@ if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Save
 
     try {
         $xml = New-Object xml
+
         $xml.Load('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange')
         $ProfileCache.ExchangeRates = $xml.exchange | Select-Object -ExpandProperty currency
+
+        $xml.Load("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=$yesterdaysDatePattern")
+        $ProfileCache.YesterdaysExchangeRates = $xml.exchange | Select-Object -ExpandProperty currency
     }
     catch {
         $SaveCache = $false
@@ -83,28 +88,25 @@ if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Save
     }
 }
 
-# $rates =
-# $usduahToday = $rates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
-# $euruahToday = $rates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
+$usduahToday = $ProfileCache.ExchangeRates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
+$euruahToday = $ProfileCache.ExchangeRates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
 
-# $yesterdaysDatePattern = (Get-Date).AddDays(-1).ToString("yyyyMMdd")
+$yesterdaysDatePattern = (Get-Date).AddDays(-1).ToString("yyyyMMdd")
 
-# $xml.Load("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=$yesterdaysDatePattern")
-# $rates = $xml.exchange | Select-Object -ExpandProperty currency
-# $usduahYesterday = $rates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
-# $euruahYesterday = $rates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
+$usduahYesterday = $ProfileCache.YesterdaysExchangeRates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
+$euruahYesterday = $ProfileCache.YesterdaysExchangeRates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
 
-# $usduahDelta = $usduahToday - $usduahYesterday
-# $euruahDelta = $euruahToday - $euruahYesterday
+$usduahDelta = $usduahToday - $usduahYesterday
+$euruahDelta = $euruahToday - $euruahYesterday
 
-# $usduahFluctuation = GetCurrencyFluctuation -total $usduahToday -delta $usduahDelta
-# $euruahFluctuation = GetCurrencyFluctuation -total $euruahToday -delta $euruahDelta
+$usduahFluctuation = GetCurrencyFluctuation -total $usduahToday -delta $usduahDelta
+$euruahFluctuation = GetCurrencyFluctuation -total $euruahToday -delta $euruahDelta
 
-# $usduahDelta = GetSignedChange ( [math]::Round($usduahDelta, 2) )
-# $euruahDelta = GetSignedChange ( [math]::Round($euruahDelta, 2) )
+$usduahDelta = GetSignedChange ( [math]::Round($usduahDelta, 2) )
+$euruahDelta = GetSignedChange ( [math]::Round($euruahDelta, 2) )
 
-# Write-Host -Object "💵 USD/UAH $usduahToday $($usduahFluctuation.Sign) $($usduahFluctuation.Percentage) ($usduahDelta) 💵" -BackgroundColor Black -ForegroundColor DarkGreen
-# Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euruahFluctuation.Percentage) ($euruahDelta) 💶" -BackgroundColor Black -ForegroundColor DarkGreen
+Write-Host -Object "💵 USD/UAH $usduahToday $($usduahFluctuation.Sign) $($usduahFluctuation.Percentage) ($usduahDelta) 💵" -BackgroundColor Black -ForegroundColor DarkGreen
+Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euruahFluctuation.Percentage) ($euruahDelta) 💶" -BackgroundColor Black -ForegroundColor DarkGreen
 
 # $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
 # Connect-Habitica -Path $habiticaCredentialsFilePath
