@@ -82,6 +82,8 @@ if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Save
         $xml.Load('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange')
         $ProfileCache.ExchangeRates = $xml.exchange | Select-Object -ExpandProperty currency
 
+        $yesterdaysDatePattern = (Get-Date).AddDays(-1).ToString("yyyyMMdd")
+
         $xml.Load("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=$yesterdaysDatePattern")
         $ProfileCache.YesterdaysExchangeRates = $xml.exchange | Select-Object -ExpandProperty currency
     }
@@ -101,6 +103,7 @@ if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Save
     catch {
         $SaveCache = $false
     }
+
     if ($SaveCache) {
         $ProfileCache | Export-Clixml $PowerShellCachePath
     }
@@ -108,8 +111,6 @@ if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Save
 
 $usduahToday = $ProfileCache.ExchangeRates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
 $euruahToday = $ProfileCache.ExchangeRates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
-
-$yesterdaysDatePattern = (Get-Date).AddDays(-1).ToString("yyyyMMdd")
 
 $usduahYesterday = $ProfileCache.YesterdaysExchangeRates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
 $euruahYesterday = $ProfileCache.YesterdaysExchangeRates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
