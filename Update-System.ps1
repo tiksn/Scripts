@@ -1,3 +1,5 @@
+#Requires -RunAsAdministrator
+
 Update-Module -Scope AllUsers
 Update-Script
 
