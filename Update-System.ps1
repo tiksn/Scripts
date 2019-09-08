@@ -2,6 +2,7 @@
 
 Update-Module -Scope AllUsers
 Update-Script
+Update-Help
 
 if ($IsWindows) {
 
