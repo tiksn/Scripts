@@ -6,11 +6,6 @@ Update-Help -Confirm:$false
 
 if ($IsWindows) {
     choco upgrade all
-
-    Import-Module -Name PSWindowsUpdate
-    Get-WUServiceManager | ForEach-Object { 
-        Install-WindowsUpdate -ServiceID $_.ServiceID -AcceptAll:$AcceptAll -Verbose:$Verbose
-    }
 }
 
 if ($IsLinux) {
