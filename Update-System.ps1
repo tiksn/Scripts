@@ -1,11 +1,16 @@
 #Requires -RunAsAdministrator
 
-Update-Module -Scope AllUsers
-Update-Script
-Update-Help
+Update-Module -Scope AllUsers -AcceptLicense -Confirm:$false
+Update-Script -AcceptLicense -Confirm:$false
+Update-Help -Confirm:$false
 
 if ($IsWindows) {
     choco upgrade all
+
+    Import-Module -Name PSWindowsUpdate
+    Get-WUServiceManager | ForEach-Object { 
+        Install-WindowsUpdate -ServiceID $_.ServiceID -AcceptAll:$AcceptAll -Verbose:$Verbose
+    }
 }
 
 if ($IsLinux) {
