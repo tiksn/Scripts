@@ -5,7 +5,7 @@ Update-Script
 Update-Help
 
 if ($IsWindows) {
-
+    choco upgrade all
 }
 
 if ($IsLinux) {
