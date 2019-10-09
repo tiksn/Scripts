@@ -24,6 +24,7 @@ else {
             DueHabitCount   = $null
             HabiticaUser    = $null
         }
+        AllCommands = $null
     }
 }
 
@@ -73,6 +74,7 @@ function GetCurrencyFluctuation {
 if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
     $ProfileCache.Release = Get-PSReleaseCurrent
     $ProfileCache.Saved = Get-Date
+    $ProfileCache.AllCommands = Get-Command -All
 
     $SaveCache = $true
 
@@ -142,6 +144,13 @@ Write-Host -Object " Dailies (left) " -NoNewline
 Write-Host -Object $ProfileCache.Habitica.DueToDoCount -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
 Write-Host -Object " To-Dos ⚒"
 
+$randomCommand = $ProfileCache.AllCommands | Get-Random
+
+Write-Host -Object "⌨ " -NoNewline
+Write-Host -Object $randomCommand.Name -NoNewline
+Write-Host -Object " $($randomCommand.CommandType.ToString()) " -NoNewline
+Write-Host -Object $randomCommand.Source -NoNewline
+Write-Host -Object " ⌨"
 
 if (($ProfileCache.Release.Version -ne $ProfileCache.Release.LocalVersion) -and ($ProfileCache.Release.Version -ne "v$($ProfileCache.Release.LocalVersion)")) {
     Write-Host -Object "🆕 New " -NoNewline -BackgroundColor White -ForegroundColor Black
