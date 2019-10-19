@@ -5,6 +5,8 @@ Update-Script -AcceptLicense -Confirm:$false
 Update-Help -Confirm:$false
 
 if ($IsWindows) {
+    Update-MpSignature
+    
     choco upgrade all
 }
 
