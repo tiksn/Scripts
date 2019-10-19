@@ -1,12 +1,15 @@
 #Requires -RunAsAdministrator
 
+[CmdletBinding()]
+Param ()
+
 Update-Module -Scope AllUsers -AcceptLicense -Confirm:$false
 Update-Script -AcceptLicense -Confirm:$false
 Update-Help -Confirm:$false
 
 if ($IsWindows) {
     Update-MpSignature
-    
+
     choco upgrade all
 }
 
@@ -26,7 +29,8 @@ if ($IsLinux) {
     }
 }
 
-# Update all .NET Core Global Tools
+Write-Verbose 'Update all .NET Core Global Tools'
+
 foreach ($package in $(dotnet tool list --global | Select-Object -Skip 2)) {
     dotnet tool update --global $($package.Split(" ", 2)[0])
 }
