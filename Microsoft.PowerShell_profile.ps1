@@ -148,7 +148,9 @@ $randomCommand = $ProfileCache.AllCommands | Get-Random
 
 Write-Host -Object "⌨ " -NoNewline
 Write-Host -Object $randomCommand.Name -NoNewline
-Write-Host -Object " $($randomCommand.CommandType.ToString()) " -NoNewline
+Write-Host -Object ' ' -NoNewline
+Write-Host -Object $randomCommand.CommandType.ToString() -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+Write-Host -Object ' ' -NoNewline
 Write-Host -Object $randomCommand.Source -NoNewline
 Write-Host -Object " ⌨"
 
