@@ -19,6 +19,7 @@ if ($IsLinux) {
     $release = $release.Substring(3)
 
     $IsFedora = ($release -eq "Fedora")
+    $IsDebian = ($release -eq "Debian")
     $IsUbuntu = ($release -eq "Ubuntu")
 
     if ($IsFedora) {
@@ -26,6 +27,11 @@ if ($IsLinux) {
         dnf update
 
         flatpak update
+    }
+
+    if($IsUbuntu -or $IsDebian) {
+        apt update
+        apt upgrade
     }
 }
 
