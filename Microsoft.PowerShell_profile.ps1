@@ -15,6 +15,7 @@ if (Test-Path -Path $PowerShellCachePath) {
 else {
     $ProfileCache = [PSCustomObject]@{
         Release                 = $null
+        ReleasePreview          = $null
         Saved                   = $null
         ExchangeRates           = $null
         YesterdaysExchangeRates = $null
@@ -24,7 +25,7 @@ else {
             DueHabitCount   = $null
             HabiticaUser    = $null
         }
-        AllCommands = $null
+        AllCommands             = $null
     }
 }
 
@@ -73,6 +74,7 @@ function GetCurrencyFluctuation {
 
 if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
     $ProfileCache.Release = Get-PSReleaseCurrent
+    $ProfileCache.ReleasePreview = Get-PSReleaseCurrent -Preview
     $ProfileCache.Saved = Get-Date
     $ProfileCache.AllCommands = Get-Command -All
 
@@ -154,9 +156,16 @@ Write-Host -Object ' ' -NoNewline
 Write-Host -Object $randomCommand.Source -NoNewline
 Write-Host -Object " ⌨"
 
-if (($ProfileCache.Release.Version -ne $ProfileCache.Release.LocalVersion) -and ($ProfileCache.Release.Version -ne "v$($ProfileCache.Release.LocalVersion)")) {
+if ($null -eq $PSVersionTable.PSVersion.PreReleaseLabel) {
+    $PSRelease = $ProfileCache.Release
+}
+else {
+    $PSRelease = $ProfileCache.ReleasePreview
+}
+
+if (($PSRelease.Version -ne $PSRelease.LocalVersion) -and ($PSRelease.Version -ne "v$($PSVersionTable.PSVersion)")) {
     Write-Host -Object "🆕 New " -NoNewline -BackgroundColor White -ForegroundColor Black
-    Write-Host -Object $ProfileCache.Release.Version -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+    Write-Host -Object $PSRelease.Version -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
     Write-Host -Object " version is available 🆕" -BackgroundColor White -ForegroundColor Black
 }
 
