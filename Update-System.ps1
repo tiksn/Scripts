@@ -10,7 +10,9 @@ Update-Help -Confirm:$false
 if ($IsWindows) {
     Update-MpSignature
 
-    choco upgrade all
+    choco upgrade --confirm all
+
+    Get-WUServiceManager | ForEach-Object { Install-WindowsUpdate -ServiceID $_.ServiceID -AcceptAll }
 }
 
 if ($IsLinux) {
