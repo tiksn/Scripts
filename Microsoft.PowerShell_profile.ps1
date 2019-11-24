@@ -194,6 +194,8 @@ function prompt {
     }
 
     Write-Host -Object "$('>' * ($nestedPromptLevel + 1))" -NoNewline
+
+    $host.ui.RawUI.WindowTitle = (Split-Path $PWD -Leaf)
     return " "
 }
 
