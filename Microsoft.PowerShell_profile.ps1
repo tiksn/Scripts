@@ -149,7 +149,7 @@ Write-Host -Object " To-Dos ⚒"
 $randomCommand = $ProfileCache.AllCommands | Get-Random
 
 Write-Host -Object "⌨ " -NoNewline
-Write-Host -Object $randomCommand.Name -NoNewline
+Write-Host -Object $randomCommand.Name -NoNewline -ForegroundColor Black -BackgroundColor White
 Write-Host -Object ' ' -NoNewline
 Write-Host -Object $randomCommand.CommandType.ToString() -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
 Write-Host -Object ' ' -NoNewline
