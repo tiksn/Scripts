@@ -2,7 +2,7 @@ Import-Module -Name ObjectiveGit
 Import-Module -Name posh-git
 Import-Module -Name Habitica
 
-if ($env:WT_SESSION -or $env:TERMINATOR_UUID) {
+if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     $formattedDate = (Get-Date).ToString("f")
     $formattedDate = "⌚ $(($formattedDate | Out-String).trim()) ⌚"
 
