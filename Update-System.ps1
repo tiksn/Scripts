@@ -11,7 +11,8 @@ if ($IsWindows) {
     Update-MpSignature
 
     choco upgrade --confirm all
-
+    scoop update
+    
     Get-WUServiceManager | ForEach-Object { Install-WindowsUpdate -ServiceID $_.ServiceID -AcceptAll }
 }
 
