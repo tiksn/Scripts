@@ -18,8 +18,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             Release                 = $null
             ReleasePreview          = $null
             Saved                   = $null
-            ExchangeRates           = $null
-            YesterdaysExchangeRates = $null
             Habitica                = [PSCustomObject]@{
                 DueDailiesCount = $null
                 DueToDoCount    = $null
@@ -82,21 +80,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         $SaveCache = $true
 
         try {
-            $xml = New-Object xml
-
-            $xml.Load('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange')
-            $ProfileCache.ExchangeRates = $xml.exchange | Select-Object -ExpandProperty currency
-
-            $yesterdaysDatePattern = (Get-Date).AddDays(-1).ToString("yyyyMMdd")
-
-            $xml.Load("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=$yesterdaysDatePattern")
-            $ProfileCache.YesterdaysExchangeRates = $xml.exchange | Select-Object -ExpandProperty currency
-        }
-        catch {
-            $SaveCache = $false
-        }
-
-        try {
             $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
             Connect-Habitica -Path $habiticaCredentialsFilePath
 
@@ -113,25 +96,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             $ProfileCache | Export-Clixml $PowerShellCachePath
         }
     }
-
-    $usduahToday = $ProfileCache.ExchangeRates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
-    $euruahToday = $ProfileCache.ExchangeRates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
-
-    $usduahYesterday = $ProfileCache.YesterdaysExchangeRates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
-    $euruahYesterday = $ProfileCache.YesterdaysExchangeRates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
-
-    $usduahDelta = $usduahToday - $usduahYesterday
-    $euruahDelta = $euruahToday - $euruahYesterday
-
-    $usduahFluctuation = GetCurrencyFluctuation -total $usduahToday -delta $usduahDelta
-    $euruahFluctuation = GetCurrencyFluctuation -total $euruahToday -delta $euruahDelta
-
-    $usduahDelta = GetSignedChange ( [math]::Round($usduahDelta, 2) )
-    $euruahDelta = GetSignedChange ( [math]::Round($euruahDelta, 2) )
-
-    Write-Host -Object "💵 USD/UAH $usduahToday $($usduahFluctuation.Sign) $($usduahFluctuation.Percentage) ($usduahDelta) 💵" -BackgroundColor Black -ForegroundColor DarkGreen
-    Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euruahFluctuation.Percentage) ($euruahDelta) 💶" -BackgroundColor Black -ForegroundColor DarkGreen
-
 
     Write-Host -Object "⚒ " -NoNewline
     Write-Host -Object " $($ProfileCache.Habitica.HabiticaUser.stats.lvl) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
@@ -210,3 +174,5 @@ $TranscriptDate = Get-Date -Format "yyyy-MM-dd--hh-mm-ss"
 $TranscriptFilePath = Join-Path -Path $PowerShellTranscriptsPath -ChildPath "$TranscriptDate.txt"
 
 Start-Transcript -Path $TranscriptFilePath -Append
+
+# Invoke-Expression (&starship init powershell)
