@@ -5,7 +5,6 @@ $WindowsTerminalMode = New-Object -TypeName System.Windows.Forms.Form
 [System.Windows.Forms.Button]$cancelButton = $null
 [System.Windows.Forms.Label]$currentBranchLabel = $null
 [System.Windows.Forms.Label]$currentBranchValueLabel = $null
-[System.Windows.Forms.Button]$button1 = $null
 function InitializeComponent
 {
 $applyButton = (New-Object -TypeName System.Windows.Forms.Button)
