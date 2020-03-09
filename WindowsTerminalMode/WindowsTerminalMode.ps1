@@ -6,10 +6,6 @@ Import-Module -Name posh-git
 # Import-Module -Name ObjectiveGit
 
 function GetCurrentBranchValue {
-    param (
-
-    )
-
     $wtPackage = Get-AppPackage -Name Microsoft.WindowsTerminal
     $packagesPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Packages'
     $wtPackageDateFolder = Join-Path -Path $packagesPath -ChildPath $wtPackage.PackageFamilyName
