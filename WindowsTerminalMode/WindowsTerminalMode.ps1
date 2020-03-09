@@ -1,11 +1,11 @@
 $branchesComboBox_SelectedIndexChanged = {
-    $applyButton.Enabled = $true
-    GetBranchValues
+    $applyButton.Enabled = $true 
 }
 
 $applyButton_Click = {
     $wtGitRepoPath = GetGitRepoPath
     Set-Branch -Branch $branchesComboBox.SelectedItem -Repository $wtGitRepoPath
+    GetBranchValues
 }
 
 $cancelButton_Click = {
