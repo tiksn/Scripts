@@ -15,16 +15,16 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     }
     else {
         $ProfileCache = [PSCustomObject]@{
-            Release                 = $null
-            ReleasePreview          = $null
-            Saved                   = $null
-            Habitica                = [PSCustomObject]@{
+            Release        = $null
+            ReleasePreview = $null
+            Saved          = $null
+            Habitica       = [PSCustomObject]@{
                 DueDailiesCount = $null
                 DueToDoCount    = $null
                 DueHabitCount   = $null
                 HabiticaUser    = $null
             }
-            AllCommands             = $null
+            AllCommands    = $null
         }
     }
 
@@ -137,7 +137,7 @@ function prompt {
     $formattedTime = (Get-Date).ToShortTimeString()
     # $formattedTime = "[$(($formattedDate | Out-String).trim())]"
     Try {
-        $repoStatus = Get-RepositoryStatus;
+        $repoStatus = Get-RepositoryStatus
         Write-Host -Object "GIT" -NoNewline -BackgroundColor Yellow -ForegroundColor Red
         Write-Host -Object " " -NoNewline
         Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor DarkBlue
@@ -145,6 +145,14 @@ function prompt {
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
         Write-VcsStatus
         Write-Host
+
+        $gitRootPath = (Split-Path (Get-GitDirectory) -Parent)
+        $gitFolderName = (Split-Path $gitRootPath -Leaf)
+        $subPath = $PWD.Path.Substring($gitRootPath.Length)
+        $subPath = $gitFolderName + $subPath
+        $pathParts = $subPath.Split([IO.Path]::DirectorySeparatorChar)
+        [array]::Reverse($pathParts)
+        $host.ui.RawUI.WindowTitle = $pathParts -join " < "
         # return "GIT $($executionContext.SessionState.Path.CurrentLocation) | $($repoStatus.CurrentBranch) $($repoStatus.Files.Count)`n$('>' * ($nestedPromptLevel + 1)) ";
     }
     Catch {
@@ -155,11 +163,12 @@ function prompt {
         Write-Host -Object " " -NoNewline
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
         Write-Host
+
+        $host.ui.RawUI.WindowTitle = (Split-Path $PWD -Leaf)
     }
 
     Write-Host -Object "$('>' * ($nestedPromptLevel + 1))" -NoNewline
 
-    $host.ui.RawUI.WindowTitle = (Split-Path $PWD -Leaf)
     return " "
 }
 
