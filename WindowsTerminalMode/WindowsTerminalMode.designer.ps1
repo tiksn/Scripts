@@ -4,6 +4,7 @@ $WindowsTerminalMode = New-Object -TypeName System.Windows.Forms.Form
 [System.Windows.Forms.Button]$applyButton = $null
 [System.Windows.Forms.Button]$cancelButton = $null
 [System.Windows.Forms.Label]$currentBranchLabel = $null
+[System.Windows.Forms.ComboBox]$branchesComboBox = $null
 [System.Windows.Forms.Label]$currentBranchValueLabel = $null
 function InitializeComponent
 {
@@ -11,6 +12,7 @@ $applyButton = (New-Object -TypeName System.Windows.Forms.Button)
 $cancelButton = (New-Object -TypeName System.Windows.Forms.Button)
 $currentBranchLabel = (New-Object -TypeName System.Windows.Forms.Label)
 $currentBranchValueLabel = (New-Object -TypeName System.Windows.Forms.Label)
+$branchesComboBox = (New-Object -TypeName System.Windows.Forms.ComboBox)
 $WindowsTerminalMode.SuspendLayout()
 #
 #applyButton
@@ -21,6 +23,7 @@ $applyButton.Size = (New-Object -TypeName System.Drawing.Size -ArgumentList @([S
 $applyButton.TabIndex = [System.Int32]0
 $applyButton.Text = [System.String]'Apply'
 $applyButton.UseVisualStyleBackColor = $true
+$applyButton.add_Click($applyButton_Click)
 #
 #cancelButton
 #
@@ -30,6 +33,7 @@ $cancelButton.Size = (New-Object -TypeName System.Drawing.Size -ArgumentList @([
 $cancelButton.TabIndex = [System.Int32]1
 $cancelButton.Text = [System.String]'Cancel'
 $cancelButton.UseVisualStyleBackColor = $true
+$cancelButton.add_Click($cancelButton_Click)
 #
 #currentBranchLabel
 #
@@ -48,9 +52,19 @@ $currentBranchValueLabel.Name = [System.String]'currentBranchValueLabel'
 $currentBranchValueLabel.Size = (New-Object -TypeName System.Drawing.Size -ArgumentList @([System.Int32]0,[System.Int32]13))
 $currentBranchValueLabel.TabIndex = [System.Int32]3
 #
+#branchesComboBox
+#
+$branchesComboBox.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
+$branchesComboBox.FormattingEnabled = $true
+$branchesComboBox.Location = (New-Object -TypeName System.Drawing.Point -ArgumentList @([System.Int32]12,[System.Int32]37))
+$branchesComboBox.Name = [System.String]'branchesComboBox'
+$branchesComboBox.Size = (New-Object -TypeName System.Drawing.Size -ArgumentList @([System.Int32]360,[System.Int32]21))
+$branchesComboBox.TabIndex = [System.Int32]4
+#
 #WindowsTerminalMode
 #
 $WindowsTerminalMode.ClientSize = (New-Object -TypeName System.Drawing.Size -ArgumentList @([System.Int32]384,[System.Int32]161))
+$WindowsTerminalMode.Controls.Add($branchesComboBox)
 $WindowsTerminalMode.Controls.Add($currentBranchValueLabel)
 $WindowsTerminalMode.Controls.Add($currentBranchLabel)
 $WindowsTerminalMode.Controls.Add($cancelButton)
@@ -66,6 +80,7 @@ Add-Member -InputObject $WindowsTerminalMode -Name base -Value $base -MemberType
 Add-Member -InputObject $WindowsTerminalMode -Name applyButton -Value $applyButton -MemberType NoteProperty
 Add-Member -InputObject $WindowsTerminalMode -Name cancelButton -Value $cancelButton -MemberType NoteProperty
 Add-Member -InputObject $WindowsTerminalMode -Name currentBranchLabel -Value $currentBranchLabel -MemberType NoteProperty
+Add-Member -InputObject $WindowsTerminalMode -Name branchesComboBox -Value $branchesComboBox -MemberType NoteProperty
 Add-Member -InputObject $WindowsTerminalMode -Name currentBranchValueLabel -Value $currentBranchValueLabel -MemberType NoteProperty
 }
 . InitializeComponent
