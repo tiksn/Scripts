@@ -5,7 +5,7 @@ $cancelButton_Click = {
 Import-Module -Name posh-git
 # Import-Module -Name ObjectiveGit
 
-function GetCurrentBranchValue {
+function GetBranchValues {
     $wtPackage = Get-AppPackage -Name Microsoft.WindowsTerminal
     $packagesPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Packages'
     $wtPackageDateFolder = Join-Path -Path $packagesPath -ChildPath $wtPackage.PackageFamilyName
@@ -17,7 +17,7 @@ function GetCurrentBranchValue {
 }
 
 $WindowsTerminalMode_Load = {
-    GetCurrentBranchValue
+    GetBranchValues
 }
 
 . (Join-Path $PSScriptRoot 'WindowsTerminalMode.designer.ps1')
