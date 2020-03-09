@@ -17,6 +17,7 @@ $WindowsTerminalMode.SuspendLayout()
 #
 #applyButton
 #
+$applyButton.Enabled = $false
 $applyButton.Location = (New-Object -TypeName System.Drawing.Point -ArgumentList @([System.Int32]216,[System.Int32]126))
 $applyButton.Name = [System.String]'applyButton'
 $applyButton.Size = (New-Object -TypeName System.Drawing.Size -ArgumentList @([System.Int32]75,[System.Int32]23))
@@ -60,6 +61,7 @@ $branchesComboBox.Location = (New-Object -TypeName System.Drawing.Point -Argumen
 $branchesComboBox.Name = [System.String]'branchesComboBox'
 $branchesComboBox.Size = (New-Object -TypeName System.Drawing.Size -ArgumentList @([System.Int32]360,[System.Int32]21))
 $branchesComboBox.TabIndex = [System.Int32]4
+$branchesComboBox.add_SelectedIndexChanged($branchesComboBox_SelectedIndexChanged)
 #
 #WindowsTerminalMode
 #
