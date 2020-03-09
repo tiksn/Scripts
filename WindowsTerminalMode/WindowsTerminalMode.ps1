@@ -18,6 +18,13 @@ function GetBranchValues {
     $currentBranch = $branches | Where-Object { $_.Current }
 
     $currentBranchValueLabel.Text = $currentBranch.Name
+
+    if ($currentBranch.Name -eq 'master') {
+        $currentBranchValueLabel.ForeColor = [System.Drawing.Color]::Blue
+    }
+    else {
+        $currentBranchValueLabel.ForeColor = [System.Drawing.Color]::Red
+    }
 }
 
 $WindowsTerminalMode_Load = {
