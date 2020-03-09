@@ -1,3 +1,7 @@
+$applyButton_Click = {
+
+}
+
 $cancelButton_Click = {
     $WindowsTerminalMode.Close()
 }
