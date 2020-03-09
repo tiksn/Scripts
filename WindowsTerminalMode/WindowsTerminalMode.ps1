@@ -1,10 +1,11 @@
 $branchesComboBox_SelectedIndexChanged = {
     $applyButton.Enabled = $true
+    GetBranchValues
 }
 
 $applyButton_Click = {
-    # Set-Branch
-    $branchesComboBox.SelectedItem | Out-GridView -Wait
+    $wtGitRepoPath = GetGitRepoPath
+    Set-Branch -Branch $branchesComboBox.SelectedItem -Repository $wtGitRepoPath
 }
 
 $cancelButton_Click = {
@@ -12,7 +13,6 @@ $cancelButton_Click = {
 }
 
 Import-Module -Name posh-git
-# Import-Module -Name ObjectiveGit
 
 function GetGitRepoPath {
     $wtPackage = Get-AppPackage -Name Microsoft.WindowsTerminal
