@@ -1,3 +1,7 @@
+$branchesComboBox_SelectedIndexChanged = {
+    $applyButton.Enabled = $true
+}
+
 $applyButton_Click = {
 
 }
@@ -24,6 +28,15 @@ function GetBranchValues {
     }
     else {
         $currentBranchValueLabel.ForeColor = [System.Drawing.Color]::Red
+    }
+
+    $localBranches = $branches | Where-Object { -not $_.Remote }
+
+    $branchesComboBox.Items.Clear()
+    $applyButton.Enabled = $false
+
+    foreach ($branch in $localBranches) {
+        $branchesComboBox.Items.Add($branch.Name)
     }
 }
 
