@@ -18,10 +18,7 @@ $targetYaml = ConvertFrom-Yaml -Yaml $targetContent -Ordered
 
 # $sourceYaml['clusters']
 # $sourceYaml['contexts']
-# $sourceYaml['current-context']
-# $sourceYaml['kind']
 # $sourceYaml['preferences']
-# $sourceYaml['users']
 
 if ( $sourceYaml['kind'] -ne 'Config') {
     throw 'Source is not kubectl config file'
@@ -36,13 +33,15 @@ if ($sourceYaml['apiVersion'] -ne $targetYaml['apiVersion']) {
 }
 
 foreach ($sourceUser in $sourceYaml['users']) {
-    $targetUser = $targetYaml['users'] | Where-Object { $_['name'] -eq $sourceUser['name'] }
+    if ($sourceUser['name'] -ne 'docker-desktop') {
+        $targetUser = $targetYaml['users'] | Where-Object { $_['name'] -eq $sourceUser['name'] }
 
-    if ($null -eq $targetUser) {
-        $targetYaml['users'] += $sourceUser
-    }
-    else {
-        $targetUser['user'] = $sourceUser['user']
+        if ($null -eq $targetUser) {
+            $targetYaml['users'] += $sourceUser
+        }
+        else {
+            $targetUser['user'] = $sourceUser['user']
+        }
     }
 }
 
