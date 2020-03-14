@@ -57,7 +57,18 @@ foreach ($sourceCluster in $sourceYaml['clusters']) {
     }
 }
 
-$sourceYaml['contexts']
+foreach ($sourceContext in $sourceYaml['contexts']) {
+    if ($sourceContext['name'] -ne 'docker-desktop') {
+        $targetContext = $targetYaml['contexts'] | Where-Object { $_['name'] -eq $sourceContext['name'] }
+
+        if ($null -eq $targetContext) {
+            $targetYaml['contexts'] += $sourceContext
+        }
+        else {
+            $targetContext['context'] = $sourceContext['context']
+        }
+    }
+}
 
 $targetContent = ConvertTo-Yaml -Data $targetYaml
 Set-Content -Path $Target -Value $targetContent
