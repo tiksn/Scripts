@@ -8,7 +8,6 @@ param (
     $Target
 )
 
-# Import-Module -Name PSKubectl
 Import-Module -Name powershell-yaml
 $sourceContent = Get-Content -Path $Source -Raw
 $targetContent = Get-Content -Path $Target -Raw
