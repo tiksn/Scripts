@@ -16,9 +16,6 @@ $targetContent = Get-Content -Path $Target -Raw
 $sourceYaml = ConvertFrom-Yaml -Yaml $sourceContent -Ordered
 $targetYaml = ConvertFrom-Yaml -Yaml $targetContent -Ordered
 
-# 
-# $sourceYaml['preferences']
-
 if ( $sourceYaml['kind'] -ne 'Config') {
     throw 'Source is not kubectl config file'
 }
