@@ -16,8 +16,7 @@ $targetContent = Get-Content -Path $Target -Raw
 $sourceYaml = ConvertFrom-Yaml -Yaml $sourceContent -Ordered
 $targetYaml = ConvertFrom-Yaml -Yaml $targetContent -Ordered
 
-# $sourceYaml['clusters']
-# $sourceYaml['contexts']
+# 
 # $sourceYaml['preferences']
 
 if ( $sourceYaml['kind'] -ne 'Config') {
@@ -44,6 +43,21 @@ foreach ($sourceUser in $sourceYaml['users']) {
         }
     }
 }
+
+foreach ($sourceCluster in $sourceYaml['clusters']) {
+    if ($sourceCluster['name'] -ne 'docker-desktop') {
+        $targetCluster = $targetYaml['clusters'] | Where-Object { $_['name'] -eq $sourceCluster['name'] }
+
+        if ($null -eq $targetCluster) {
+            $targetYaml['clusters'] += $sourceCluster
+        }
+        else {
+            $targetCluster['cluster'] = $sourceCluster['cluster']
+        }
+    }
+}
+
+$sourceYaml['contexts']
 
 $targetContent = ConvertTo-Yaml -Data $targetYaml
 Set-Content -Path $Target -Value $targetContent
