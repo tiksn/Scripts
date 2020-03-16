@@ -71,7 +71,7 @@ $WindowsTerminalMode.Controls.Add($currentBranchValueLabel)
 $WindowsTerminalMode.Controls.Add($currentBranchLabel)
 $WindowsTerminalMode.Controls.Add($cancelButton)
 $WindowsTerminalMode.Controls.Add($applyButton)
-$WindowsTerminalMode.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedToolWindow
+$WindowsTerminalMode.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
 $WindowsTerminalMode.Name = [System.String]'WindowsTerminalMode'
 $WindowsTerminalMode.StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
 $WindowsTerminalMode.Text = [System.String]'Windows Terminal Mode'
