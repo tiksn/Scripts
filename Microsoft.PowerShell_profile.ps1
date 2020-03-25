@@ -1,6 +1,7 @@
 Import-Module -Name ObjectiveGit
 Import-Module -Name posh-git
 Import-Module -Name Habitica
+Import-Module -Name PSCalendar
 
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     $formattedDate = (Get-Date).ToString("f")
@@ -83,9 +84,13 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
             Connect-Habitica -Path $habiticaCredentialsFilePath
 
-            $ProfileCache.Habitica.DueDailiesCount = (Get-HabiticaTask -Type dailys | Where-Object { $_.IsDue -and (-not $_.completed) } | Measure-Object).Count
-            $ProfileCache.Habitica.DueToDoCount = (Get-HabiticaTask -Type todos | Measure-Object).Count
-            $ProfileCache.Habitica.DueHabitCount = (Get-HabiticaTask -Type habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) } | Measure-Object).Count
+            $dailys = Get-HabiticaTask -Type dailys
+            $todos = Get-HabiticaTask -Type todos
+            $habits = Get-HabiticaTask -Type habits
+
+            $ProfileCache.Habitica.DueDailiesCount = ($dailys | Where-Object { $_.IsDue -and (-not $_.completed) } | Measure-Object).Count
+            $ProfileCache.Habitica.DueToDoCount = ($todos | Measure-Object).Count
+            $ProfileCache.Habitica.DueHabitCount = ($habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) } | Measure-Object).Count
             $ProfileCache.Habitica.HabiticaUser = Get-HabiticaUser
         }
         catch {
@@ -131,6 +136,8 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         Write-Host -Object $PSRelease.Version -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
         Write-Host -Object " version is available 🆕" -BackgroundColor White -ForegroundColor Black
     }
+
+    Show-Calendar
 }
 
 function prompt {
