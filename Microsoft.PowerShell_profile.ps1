@@ -138,6 +138,8 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     }
 
     Show-Calendar
+
+    Write-Host -Object " "
 }
 
 function prompt {
