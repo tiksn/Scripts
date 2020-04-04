@@ -141,6 +141,12 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     Show-Calendar
 
     Write-Host -Object " "
+
+    gh completion --shell powershell | Set-Variable -Name ghCompletion
+
+    $ghCompletion = $ghCompletion | ForEach-Object { Write-Output $_ } | Join-String -Separator ([System.Environment]::NewLine)
+    $ghCompletion = [scriptblock]::Create($ghCompletion)
+    Invoke-Command -ScriptBlock $ghCompletion 
 }
 
 function prompt {
