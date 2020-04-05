@@ -25,7 +25,8 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
                 DueDailies      = $null
                 DueDailiesCount = $null
                 DueToDoCount    = $null
-                DueHabitCount   = $null
+                DueHabits       = $null
+                DueHabitsCount  = $null
                 HabiticaUser    = $null
             }
             AllCommands    = $null
@@ -91,10 +92,12 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             $todos = Get-HabiticaTask -Type todos
             $habits = Get-HabiticaTask -Type habits
 
+            $habits | Out-GridView -Wait
             $ProfileCache.Habitica.DueDailies = $dailys | Where-Object { $_.IsDue -and (-not $_.completed) } 
             $ProfileCache.Habitica.DueDailiesCount = ($ProfileCache.Habitica.DueDailies | Measure-Object).Count
             $ProfileCache.Habitica.DueToDoCount = ($todos | Measure-Object).Count
-            $ProfileCache.Habitica.DueHabitCount = ($habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) } | Measure-Object).Count
+            $ProfileCache.Habitica.DueHabits = $habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) }
+            $ProfileCache.Habitica.DueHabitsCount = ($ProfileCache.Habitica.DueHabits | Measure-Object).Count
             $ProfileCache.Habitica.HabiticaUser = Get-HabiticaUser
         }
         catch {
@@ -144,6 +147,20 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         foreach ($dueDailySubTask in $dueDaily.checklist) {
             #
         }
+    }
+
+    # order by $dueHabit.value or $dueHabit.priority
+    $topDueHabits = $ProfileCache.Habitica.DueHabits | Sort-Object -Property value -Descending | Select-Object -First 5
+    foreach ($dueHabit in $topDueHabits) {
+        Write-Host -Object "👑 " -NoNewline
+        Write-Host -Object $dueHabit.text -NoNewline
+        if ($dueHabit.notes) {
+            Write-Host -Object ' (' -NoNewline
+            Write-Host -Object $dueHabit.notes -NoNewline
+            Write-Host -Object ')' -NoNewline
+        }
+        
+        Write-Host -Object " 👑"
     }
 
     Show-Calendar
