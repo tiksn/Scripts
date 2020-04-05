@@ -21,6 +21,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             ReleasePreview = $null
             Saved          = $null
             Habitica       = [PSCustomObject]@{
+                DueDailies      = $null
                 DueDailiesCount = $null
                 DueToDoCount    = $null
                 DueHabitCount   = $null
@@ -89,7 +90,8 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             $todos = Get-HabiticaTask -Type todos
             $habits = Get-HabiticaTask -Type habits
 
-            $ProfileCache.Habitica.DueDailiesCount = ($dailys | Where-Object { $_.IsDue -and (-not $_.completed) } | Measure-Object).Count
+            $ProfileCache.Habitica.DueDailies = $dailys | Where-Object { $_.IsDue -and (-not $_.completed) } 
+            $ProfileCache.Habitica.DueDailiesCount = ($ProfileCache.Habitica.DueDailies | Measure-Object).Count
             $ProfileCache.Habitica.DueToDoCount = ($todos | Measure-Object).Count
             $ProfileCache.Habitica.DueHabitCount = ($habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) } | Measure-Object).Count
             $ProfileCache.Habitica.HabiticaUser = Get-HabiticaUser
