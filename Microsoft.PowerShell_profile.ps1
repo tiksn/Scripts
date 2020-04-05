@@ -24,6 +24,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             Habitica       = [PSCustomObject]@{
                 DueDailies      = $null
                 DueDailiesCount = $null
+                DueToDos        = $null
                 DueToDoCount    = $null
                 DueHabits       = $null
                 DueHabitsCount  = $null
@@ -92,10 +93,10 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             $todos = Get-HabiticaTask -Type todos
             $habits = Get-HabiticaTask -Type habits
 
-            $habits | Out-GridView -Wait
             $ProfileCache.Habitica.DueDailies = $dailys | Where-Object { $_.IsDue -and (-not $_.completed) } 
             $ProfileCache.Habitica.DueDailiesCount = ($ProfileCache.Habitica.DueDailies | Measure-Object).Count
-            $ProfileCache.Habitica.DueToDoCount = ($todos | Measure-Object).Count
+            $ProfileCache.Habitica.DueToDos = $todos
+            $ProfileCache.Habitica.DueToDoCount = ($ProfileCache.Habitica.DueToDos | Measure-Object).Count
             $ProfileCache.Habitica.DueHabits = $habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) }
             $ProfileCache.Habitica.DueHabitsCount = ($ProfileCache.Habitica.DueHabits | Measure-Object).Count
             $ProfileCache.Habitica.HabiticaUser = Get-HabiticaUser
@@ -161,6 +162,26 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         }
         
         Write-Host -Object " 👑"
+    }
+
+    # order by $dueHabit.value or $dueHabit.priority
+    $topDueToDos = $ProfileCache.Habitica.DueToDos | Sort-Object -Property value -Descending | Select-Object -First 5
+    foreach ($dueToDo in $topDueToDos) {
+        Write-Host -Object "🏆 " -NoNewline
+        Write-Host -Object $dueToDo.text -NoNewline
+        if ($dueToDo.notes) {
+            Write-Host -Object ' (' -NoNewline
+            Write-Host -Object $dueToDo.notes -NoNewline
+            Write-Host -Object ')' -NoNewline
+        }
+        Write-Host -Object " 🏆"
+
+        $dueToDoSubTasks = $dueToDo.checklist | Where-Object { -not $_.completed }
+        foreach ($dueToDoSubTask in $dueToDoSubTasks) {
+            Write-Host -Object "    🏆 " -NoNewline
+            Write-Host -Object $dueToDoSubTask.text -NoNewline
+            Write-Host -Object " 🏆"
+        }
     }
 
     Show-Calendar
