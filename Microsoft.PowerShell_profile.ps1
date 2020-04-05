@@ -5,7 +5,8 @@ Import-Module -Name PSCalendar
 Import-Module -Name PSReleaseTools
 
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
-    $formattedDate = (Get-Date).ToString("f")
+    $profileRunTime = Get-Date
+    $formattedDate = $profileRunTime.ToString("f")
     $formattedDate = "⌚ $(($formattedDate | Out-String).trim()) ⌚"
 
     Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlue
@@ -135,55 +136,60 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         Write-Host -Object " version is available 🆕" -BackgroundColor White -ForegroundColor Black
     }
 
-    foreach ($dueDaily in $ProfileCache.Habitica.DueDailies) {
-        Write-Host -Object "🍒 " -NoNewline
-        Write-Host -Object $dueDaily.text -NoNewline
-        if ($dueDaily.notes) {
-            Write-Host -Object ' (' -NoNewline
-            Write-Host -Object $dueDaily.notes -NoNewline
-            Write-Host -Object ')' -NoNewline
-        }
-        Write-Host -Object " 🍒"
+    $isWorkDay = ($profileRunTime.DayOfWeek -ne [System.DayOfWeek]::Saturday) -and ($profileRunTime.DayOfWeek -ne [System.DayOfWeek]::Sunday)
+    $isWorkHour = ($profileRunTime.TimeOfDay -gt [System.TimeSpan]::FromHours(10) -and ($profileRunTime.TimeOfDay -lt [System.TimeSpan]::FromHours(20)))
 
-        foreach ($dueDailySubTask in $dueDaily.checklist) {
-            #
-        }
-    }
+    if (-not $isWorkDay -or -not $isWorkHour) {
+        foreach ($dueDaily in $ProfileCache.Habitica.DueDailies) {
+            Write-Host -Object "🍒 " -NoNewline
+            Write-Host -Object $dueDaily.text -NoNewline
+            if ($dueDaily.notes) {
+                Write-Host -Object ' (' -NoNewline
+                Write-Host -Object $dueDaily.notes -NoNewline
+                Write-Host -Object ')' -NoNewline
+            }
+            Write-Host -Object " 🍒"
 
-    # order by $dueHabit.value or $dueHabit.priority
-    $topDueHabits = $ProfileCache.Habitica.DueHabits | Sort-Object -Property value -Descending | Select-Object -First 5
-    foreach ($dueHabit in $topDueHabits) {
-        Write-Host -Object "👑 " -NoNewline
-        Write-Host -Object $dueHabit.text -NoNewline
-        if ($dueHabit.notes) {
-            Write-Host -Object ' (' -NoNewline
-            Write-Host -Object $dueHabit.notes -NoNewline
-            Write-Host -Object ')' -NoNewline
+            foreach ($dueDailySubTask in $dueDaily.checklist) {
+                #
+            }
         }
+
+        # order by $dueHabit.value or $dueHabit.priority
+        $topDueHabits = $ProfileCache.Habitica.DueHabits | Sort-Object -Property value -Descending | Select-Object -First 5
+        foreach ($dueHabit in $topDueHabits) {
+            Write-Host -Object "👑 " -NoNewline
+            Write-Host -Object $dueHabit.text -NoNewline
+            if ($dueHabit.notes) {
+                Write-Host -Object ' (' -NoNewline
+                Write-Host -Object $dueHabit.notes -NoNewline
+                Write-Host -Object ')' -NoNewline
+            }
         
-        Write-Host -Object " 👑"
-    }
-
-    # order by $dueHabit.value or $dueHabit.priority
-    $topDueToDos = $ProfileCache.Habitica.DueToDos | Sort-Object -Property value -Descending | Select-Object -First 5
-    foreach ($dueToDo in $topDueToDos) {
-        Write-Host -Object "🏆 " -NoNewline
-        Write-Host -Object $dueToDo.text -NoNewline
-        if ($dueToDo.notes) {
-            Write-Host -Object ' (' -NoNewline
-            Write-Host -Object $dueToDo.notes -NoNewline
-            Write-Host -Object ')' -NoNewline
+            Write-Host -Object " 👑"
         }
-        Write-Host -Object " 🏆"
 
-        $dueToDoSubTasks = $dueToDo.checklist | Where-Object { -not $_.completed }
-        foreach ($dueToDoSubTask in $dueToDoSubTasks) {
-            Write-Host -Object "    🏆 " -NoNewline
-            Write-Host -Object $dueToDoSubTask.text -NoNewline
+        # order by $dueHabit.value or $dueHabit.priority
+        $topDueToDos = $ProfileCache.Habitica.DueToDos | Sort-Object -Property value -Descending | Select-Object -First 5
+        foreach ($dueToDo in $topDueToDos) {
+            Write-Host -Object "🏆 " -NoNewline
+            Write-Host -Object $dueToDo.text -NoNewline
+            if ($dueToDo.notes) {
+                Write-Host -Object ' (' -NoNewline
+                Write-Host -Object $dueToDo.notes -NoNewline
+                Write-Host -Object ')' -NoNewline
+            }
             Write-Host -Object " 🏆"
+
+            $dueToDoSubTasks = $dueToDo.checklist | Where-Object { -not $_.completed }
+            foreach ($dueToDoSubTask in $dueToDoSubTasks) {
+                Write-Host -Object "    🏆 " -NoNewline
+                Write-Host -Object $dueToDoSubTask.text -NoNewline
+                Write-Host -Object " 🏆"
+            }
         }
     }
-
+    
     Show-Calendar
     Write-Host -Object " "
 
