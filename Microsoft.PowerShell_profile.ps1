@@ -9,6 +9,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     $formattedDate = "⌚ $(($formattedDate | Out-String).trim()) ⌚"
 
     Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlue
+    Write-Host -Object ' '
 
     $PowerShellCachePath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
 
@@ -117,16 +118,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     Write-Host -Object " $($ProfileCache.Habitica.DueToDoCount) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
     Write-Host -Object " To-Dos ⚒"
 
-    $randomCommand = $ProfileCache.AllCommands | Get-Random
-
-    Write-Host -Object "⌨ " -NoNewline
-    Write-Host -Object $randomCommand.Name -NoNewline -ForegroundColor Black -BackgroundColor White
-    Write-Host -Object ' ' -NoNewline
-    Write-Host -Object $randomCommand.CommandType.ToString() -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-    Write-Host -Object ' ' -NoNewline
-    Write-Host -Object $randomCommand.Source -NoNewline
-    Write-Host -Object " ⌨"
-
     if ($null -eq $PSVersionTable.PSVersion.PreReleaseLabel) {
         $PSRelease = $ProfileCache.Release
     }
@@ -156,7 +147,17 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     }
 
     Show-Calendar
+    Write-Host -Object " "
 
+    $randomCommand = $ProfileCache.AllCommands | Get-Random
+
+    Write-Host -Object "⌨ " -NoNewline
+    Write-Host -Object $randomCommand.Name -NoNewline -ForegroundColor Black -BackgroundColor White
+    Write-Host -Object ' ' -NoNewline
+    Write-Host -Object $randomCommand.CommandType.ToString() -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+    Write-Host -Object ' ' -NoNewline
+    Write-Host -Object $randomCommand.Source -NoNewline
+    Write-Host -Object " ⌨"
     Write-Host -Object " "
 
     gh completion --shell powershell | Set-Variable -Name ghCompletion
