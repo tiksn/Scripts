@@ -116,8 +116,8 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     Write-Host -Object " Level " -NoNewline
     Write-Host -Object " $(($ProfileCache.Habitica.HabiticaUser.stats.gp.ToString("N0"))) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
     Write-Host -Object " Gold " -NoNewline
-    Write-Host -Object " $($ProfileCache.Habitica.DueHabitCount) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-    Write-Host -Object " Habits (inacted) " -NoNewline
+    Write-Host -Object " $($ProfileCache.Habitica.DueHabitsCount) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+    Write-Host -Object " Habits (pending) " -NoNewline
     Write-Host -Object " $($ProfileCache.Habitica.DueDailiesCount) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
     Write-Host -Object " Dailies (left) " -NoNewline
     Write-Host -Object " $($ProfileCache.Habitica.DueToDoCount) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
