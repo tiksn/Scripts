@@ -140,6 +140,21 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         Write-Host -Object " version is available 🆕" -BackgroundColor White -ForegroundColor Black
     }
 
+    foreach ($dueDaily in $ProfileCache.Habitica.DueDailies) {
+        Write-Host -Object "🍒 " -NoNewline
+        Write-Host -Object $dueDaily.text -NoNewline
+        if ($dueDaily.notes) {
+            Write-Host -Object ' (' -NoNewline
+            Write-Host -Object $dueDaily.notes -NoNewline
+            Write-Host -Object ')' -NoNewline
+        }
+        Write-Host -Object " 🍒"
+
+        foreach ($dueDailySubTask in $dueDaily.checklist) {
+            #
+        }
+    }
+
     Show-Calendar
 
     Write-Host -Object " "
