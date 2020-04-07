@@ -150,8 +150,11 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             }
             Write-Host -Object " 🍒"
 
-            foreach ($dueDailySubTask in $dueDaily.checklist) {
-                #
+            $dueDailySubTasks = $dueDaily.checklist | Where-Object { -not $_.completed }
+            foreach ($dueDailySubTask in $dueDailySubTasks) {
+                Write-Host -Object "    🍒 " -NoNewline
+                Write-Host -Object $dueDailySubTask.text -NoNewline
+                Write-Host -Object " 🍒"
             }
         }
 
