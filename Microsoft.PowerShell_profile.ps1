@@ -82,7 +82,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         $ProfileCache.Release = Get-PSReleaseCurrent
         $ProfileCache.ReleasePreview = Get-PSReleaseCurrent -Preview
         $ProfileCache.Saved = Get-Date
-        $ProfileCache.AllCommands = Get-Command -All
+        $ProfileCache.AllCommands = Get-Command * | Select-Object -Unique
 
         $SaveCache = $true
 
@@ -217,6 +217,12 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
 function prompt {
     $formattedTime = (Get-Date).ToShortTimeString()
     # $formattedTime = "[$(($formattedDate | Out-String).trim())]"
+    $jobs = @(Get-Job | Where-Object { $_.State -eq 'Running' }).Count
+    if ($jobs -gt 0) {
+        1..$jobs | ForEach-Object { Write-Host "🔨" -NoNewline }
+        Write-Host " " -NoNewline
+    }
+    
     Try {
         $repoStatus = Get-RepositoryStatus
         Write-Host -Object "GIT" -NoNewline -BackgroundColor Yellow -ForegroundColor Red
