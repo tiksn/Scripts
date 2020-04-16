@@ -225,8 +225,6 @@ function prompt {
     
     Try {
         $repoStatus = Get-RepositoryStatus
-        Write-Host -Object "GIT" -NoNewline -BackgroundColor Yellow -ForegroundColor Red
-        Write-Host -Object " " -NoNewline
         Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor DarkBlue
         Write-Host -Object " " -NoNewline
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
@@ -244,8 +242,6 @@ function prompt {
     }
     Catch {
         $repoStatus = $null;
-        Write-Host -Object "PSC" -NoNewline -BackgroundColor Yellow -ForegroundColor Red
-        Write-Host -Object " " -NoNewline
         Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor DarkBlue
         Write-Host -Object " " -NoNewline
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
