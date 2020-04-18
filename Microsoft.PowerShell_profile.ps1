@@ -34,7 +34,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             AllCommands    = $null
         }
     }
-
+    
     function GetSignedChange {
         param (
             $change
@@ -78,11 +78,18 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         }
     }
 
+    $updateAllCommands = $false
     if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
         $ProfileCache.Release = Get-PSReleaseCurrent
         $ProfileCache.ReleasePreview = Get-PSReleaseCurrent -Preview
         $ProfileCache.Saved = Get-Date
-        $ProfileCache.AllCommands = Get-Command * | Select-Object -Unique
+
+        if ($null -eq $ProfileCache.AllCommands) {
+            $ProfileCache.AllCommands = Get-Command * | Select-Object -Unique
+        }
+        else {
+            $updateAllCommands = $true
+        }
 
         $SaveCache = $true
 
@@ -108,6 +115,15 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
 
         if ($SaveCache) {
             $ProfileCache | Export-Clixml $PowerShellCachePath
+
+            if ($updateAllCommands) {
+                Start-Job {
+                    $PowerShellCachePath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
+                    $ProfileCache = Import-Clixml -Path $PowerShellCachePath
+                    $ProfileCache.AllCommands = Get-Command * | Select-Object -Unique
+                    $ProfileCache | Export-Clixml $PowerShellCachePath
+                } | Out-Null
+            }
         }
     }
 
