@@ -3,6 +3,7 @@ Import-Module -Name posh-git
 Import-Module -Name Habitica
 Import-Module -Name PSCalendar
 Import-Module -Name PSReleaseTools
+Import-Module -Name PowerShellHumanizer
 
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     $profileRunTime = Get-Date
@@ -233,6 +234,13 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
 function prompt {
     $formattedTime = (Get-Date).ToShortTimeString()
     # $formattedTime = "[$(($formattedDate | Out-String).trim())]"
+    $lastCmd = Get-History -Count 1
+    if ($null -ne $lastCmd -and $null -ne $lastCmd.Duration -and $lastCmd.Duration.TotalSeconds -gt 1) {
+        $lastCmdDuration = $lastCmd.Duration.Humanize()
+        Write-Host -Object "$lastCmdDuration" -NoNewline -ForegroundColor Magenta
+        Write-Host " " -NoNewline
+    }
+
     $jobs = @(Get-Job | Where-Object { $_.State -eq 'Running' }).Count
     if ($jobs -gt 0) {
         1..$jobs | ForEach-Object { Write-Host "🔨" -NoNewline }
