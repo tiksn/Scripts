@@ -224,11 +224,20 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     Write-Host -Object " ⌨"
     Write-Host -Object " "
 
+    # PowerShell parameter completion shim for the GitHub CLI
     gh completion --shell powershell | Set-Variable -Name ghCompletion
 
     $ghCompletion = $ghCompletion | ForEach-Object { Write-Output $_ } | Join-String -Separator ([System.Environment]::NewLine)
     $ghCompletion = [scriptblock]::Create($ghCompletion)
-    Invoke-Command -ScriptBlock $ghCompletion 
+    Invoke-Command -ScriptBlock $ghCompletion
+
+    # PowerShell parameter completion shim for the dotnet CLI
+    Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
+        param($commandName, $wordToComplete, $cursorPosition)
+        dotnet complete --position $cursorPosition "$wordToComplete" | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+        }
+    }
 }
 
 function prompt {
