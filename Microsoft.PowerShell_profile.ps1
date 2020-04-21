@@ -225,8 +225,9 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     Write-Host -Object " "
 
     if ($randomCommand.CommandType -ne [System.Management.Automation.CommandTypes]::Application) {
-        Get-Command -Name $randomCommand.Name -Syntax
+        # Get-Command -Name $randomCommand.Name -Syntax
     }
+    
     # PowerShell parameter completion shim for the GitHub CLI
     gh completion --shell powershell | Set-Variable -Name ghCompletion
 
