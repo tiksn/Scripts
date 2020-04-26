@@ -27,5 +27,8 @@ $vsDebugConsoleProcess = $vsDebugConsoleProcesses | Where-Object { (CheckProcess
 if ($null -ne $vsDebugConsoleProcess) {
     $winProcesses = Get-CimInstance Win32_Process
     $vsDebugConsoleWinProcess = $winProcesses | Where-Object { $_.ProcessId -eq $vsDebugConsoleProcess.Id }
-    Write-Output $vsDebugConsoleWinProcess.CommandLine
+    Stop-Process -Id $vsDebugConsoleProcess.Id
+    if ($?) {
+        Start-Process $vsDebugConsoleWinProcess.CommandLine
+    }
 }
