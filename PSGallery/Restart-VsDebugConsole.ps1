@@ -41,9 +41,11 @@ if ($null -ne $vsDebugConsoleProcess) {
     Write-Debug "ID: $($vsDebugConsoleProcess.Id), Name: $($vsDebugConsoleProcess.Name)"
     $winProcesses = Get-CimInstance Win32_Process
     $vsDebugConsoleWinProcess = $winProcesses | Where-Object { $_.ProcessId -eq $vsDebugConsoleProcess.Id }
-    $vsDebugConsoleProcess | Stop-Process
     KillProcessTree $vsDebugConsoleProcess.Id
-    # if ($?) {
-    #     Start-Process $vsDebugConsoleWinProcess.CommandLine
-    # }
+    if ($?) {
+        $commandLine = $vsDebugConsoleWinProcess.CommandLine
+        $args = Invoke-Expression ".{`$args} $commandLine"
+
+        Start-Process -FilePath $args[0] -ArgumentList ($args | Select-Object -Skip 1) -Wait
+    }
 }
