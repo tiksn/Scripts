@@ -66,6 +66,7 @@ $commands = @{
 }
 
 foreach ($distribution in $distributions) {
+    Write-Verbose "$distribution"
     $distributionCommands = $commands[$distribution]
 
     foreach ($installWsluCommand in $distributionCommands.InstallWsluCommands) {
