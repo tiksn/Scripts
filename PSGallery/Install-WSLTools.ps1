@@ -42,3 +42,5 @@
 Param()
 
 
+$distributions = wsl --list | Where-Object { $_ -ne $null -and $_ -ne "" } | Select-Object -Skip 1 | ForEach-Object { ($_ -split " ")[0] }
+$distributions | Out-GridView -Wait
