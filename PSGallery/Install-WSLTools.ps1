@@ -100,6 +100,7 @@ foreach ($distribution in $distributions) {
         wsl --distribution $distribution bash -c $command
     }
 
+    wsl --distribution $distribution bash -c "sudo apt-get install python3-pip"
     wsl --distribution $distribution bash -c "python3 -m pip install wslpy"
     wsl --distribution $distribution wslfetch
 }
