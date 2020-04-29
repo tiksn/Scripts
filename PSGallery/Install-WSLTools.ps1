@@ -54,18 +54,34 @@ $distributions = wsl --list
 
 $WslCommands = @{
     "Ubuntu" = @{
-        InstallWsluCommands = @(
+        InstallWsluCommands       = @(
             "sudo apt update",
             "sudo apt install ubuntu-wsl"
         )
+        PowerShellInstallCommands = @(
+            "sudo apt-get update",
+            "sudo apt-get install -y curl apt-transport-https",
+            "curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -",
+            "sudo sh -c 'echo `"deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-jessie-prod jessie main`" > /etc/apt/sources.list.d/microsoft.list'",
+            "sudo apt-get update",
+            "sudo apt-get install -y powershell",
+            "pwsh --version"
+        )
     }
     "Debian" = @{
-        InstallWsluCommands = @(
+        InstallWsluCommands       = @(
             "sudo apt install gnupg2 apt-transport-https",
             "wget -O - https://access.patrickwu.space/wslu/public.asc | sudo apt-key add -",
             "echo `"deb https://access.patrickwu.space/wslu/debian buster main`" | sudo tee -a /etc/apt/sources.list",
             "sudo apt update",
             "sudo apt install wslu"
+        )
+        PowerShellInstallCommands = @(
+            "wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb",
+            "sudo dpkg -i packages-microsoft-prod.deb",
+            "sudo apt-get update",
+            "sudo apt-get install -y powershell",
+            "pwsh --version"
         )
     }
 }
@@ -74,9 +90,14 @@ foreach ($distribution in $distributions) {
     Write-Verbose "$distribution"
     $distributionCommands = $WslCommands[$distribution]
 
-    foreach ($installWsluCommand in $distributionCommands.InstallWsluCommands) {
-        Write-Verbose "$distribution`: $installWsluCommand"
-        wsl --exec $installWsluCommand --distribution $distribution
+    foreach ($command in $distributionCommands.InstallWsluCommands) {
+        Write-Verbose "$distribution`: WSLU: $command"
+        wsl --exec $command --distribution $distribution
+    }
+
+    foreach ($command in $distributionCommands.PowerShellInstallCommands) {
+        Write-Verbose "$distribution`: PWSH: $command"
+        wsl --exec $command --distribution $distribution
     }
 
     wsl --exec "python3 -m pip install wslpy" --distribution $distribution
