@@ -92,14 +92,14 @@ foreach ($distribution in $distributions) {
 
     foreach ($command in $distributionCommands.InstallWsluCommands) {
         Write-Verbose "$distribution`: WSLU: $command"
-        wsl --exec $command --distribution $distribution
+        wsl --distribution $distribution bash -c $command
     }
 
     foreach ($command in $distributionCommands.PowerShellInstallCommands) {
         Write-Verbose "$distribution`: PWSH: $command"
-        wsl --exec $command --distribution $distribution
+        wsl --distribution $distribution bash -c $command
     }
 
-    wsl --exec "python3 -m pip install wslpy" --distribution $distribution
-    wsl --exec "wslfetch" --distribution $distribution
+    wsl --distribution $distribution bash -c "python3 -m pip install wslpy"
+    wsl --distribution $distribution wslfetch
 }
