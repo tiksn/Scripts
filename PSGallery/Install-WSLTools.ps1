@@ -72,7 +72,6 @@ $WslCommands = @{
 
 foreach ($distribution in $distributions) {
     Write-Verbose "$distribution"
-    Write-Verbose $WslCommands[$distribution]
     $distributionCommands = $WslCommands[$distribution]
 
     foreach ($installWsluCommand in $distributionCommands.InstallWsluCommands) {
@@ -80,5 +79,6 @@ foreach ($distribution in $distributions) {
         wsl --exec $installWsluCommand --distribution $distribution
     }
 
+    wsl --exec "python3 -m pip install wslpy" --distribution $distribution
     wsl --exec "wslfetch" --distribution $distribution
 }
