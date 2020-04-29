@@ -43,11 +43,16 @@
 Param()
 
 
-$distributions = wsl --list | Where-Object { $_ -ne $null -and $_ -ne "" } | Select-Object -Skip 1 | ForEach-Object { ($_ -split " ")[0] }
+$distributions = wsl --list
+| Where-Object { $_ -ne $null -and $_ -ne "" }
+| Select-Object -Skip 1
+| ForEach-Object { ($_ -split " ")[0].Trim() }
+| ForEach-Object { $_.TrimEnd("`0`r`n") }
+| ForEach-Object { $_.Replace("`0", "") }
 
 # https://github.com/wslutilities/wslu
 
-$commands = @{
+$WslCommands = @{
     "Ubuntu" = @{
         InstallWsluCommands = @(
             "sudo apt update",
@@ -67,7 +72,8 @@ $commands = @{
 
 foreach ($distribution in $distributions) {
     Write-Verbose "$distribution"
-    $distributionCommands = $commands[$distribution]
+    Write-Verbose $WslCommands[$distribution]
+    $distributionCommands = $WslCommands[$distribution]
 
     foreach ($installWsluCommand in $distributionCommands.InstallWsluCommands) {
         Write-Verbose "$distribution`: $installWsluCommand"
