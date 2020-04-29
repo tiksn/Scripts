@@ -43,4 +43,15 @@ Param()
 
 
 $distributions = wsl --list | Where-Object { $_ -ne $null -and $_ -ne "" } | Select-Object -Skip 1 | ForEach-Object { ($_ -split " ")[0] }
-$distributions | Out-GridView -Wait
+
+foreach ($distribution in $distributions) {
+    switch ($distribution) {
+        "Ubuntu" {
+            Write-Host "Ubuntu" 
+        }
+        "Debian" { 
+            Write-Host "Debian" 
+        }
+        Default { Write-Error "$distribution is not supported" }
+    }
+}
