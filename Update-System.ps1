@@ -60,4 +60,18 @@ foreach ($package in $(dotnet tool list --global | Select-Object -Skip 2)) {
     }
 }
 
+Write-Progress -Activity "Updating all Rust Cargo Crates" -Id 1478576163
+
+$installList = cargo install --list
+if ($?) {
+    $packages = $installList | Where-Object { -not $_.StartsWith( ' ') } | ForEach-Object { ($_ -split ' ')[0] }
+
+    foreach ($package in $packages) {
+        if ($PSCmdlet.ShouldProcess("Rust Cargo Crate $package", "Update Rust Cargo Crate")) {
+            Write-Progress -Activity "Updating all Rust Cargo Crates" -Id 1478576163 -CurrentOperation "Installing Crate $package ..."
+            cargo install $package
+        }
+    }
+}
+
 Write-Progress -Activity "The End." -Completed -Id 1478576163
