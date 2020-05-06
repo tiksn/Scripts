@@ -25,8 +25,11 @@ Write-Verbose "Habitica board Notes $($habiticaBoard[2])"
 $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
 Connect-Habitica -Path $habiticaCredentialsFilePath
 $todos = Get-HabiticaTask -Type todos
+$completedTodos = Get-HabiticaTask -Type completedTodos
 
-foreach ($todo in $todos) {
+$allTodos = $todos + $completedTodos
+
+foreach ($todo in $allTodos) {
     $description = $todo.description ?? ""
 
     if ($todo.checklist) {
@@ -45,6 +48,13 @@ foreach ($todo in $todos) {
         }
     }
     
+    if ($todo.completed) {
+        $category = "Completed"
+    }
+    else {
+        $category = "Backlog"
+    }
+
     $sqlParameters = @{
         BoardID = $habiticaBoardId
         Title   = $todo.text
@@ -59,7 +69,7 @@ foreach ($todo in $todos) {
             DateCreated  = $todo.createdAt.ToString()
             Title        = $todo.text
             Description  = $description
-            Category     = "Backlog"
+            Category     = $category
             ColumnIndex  = '0'
             ColorKey     = "Normal"
             Tags         = ""
@@ -73,14 +83,22 @@ foreach ($todo in $todos) {
         Invoke-SQLiteQuery -Database $ktdatabase -Query "INSERT INTO `"main`".`"tblTasks`"(`"Id`",`"BoardID`",`"DateCreated`",`"Title`",`"Description`",`"Category`",`"ColumnIndex`",`"ColorKey`",`"Tags`",`"DueDate`",`"FinishDate`",`"TimeDue`",`"ReminderTime`",`"StartDate`") VALUES (NULL, @BoardID, @DateCreated, @Title, @Description, @Category, @ColumnIndex, @ColorKey, @Tags, @DueDate, @FinishDate, @TimeDue, @ReminderTime, @StartDate );" -SqlParameters $sqlParameters | Out-Null
     }
     else {
-        Write-Verbose "Update To-Do description for $($todo.text)"
-
         $taskID = $todoInDb[0]
+
+        Write-Verbose "Update To-Do description for $($todo.text)"
         $sqlParameters = @{
             Id          = $taskID
             Description = $description
-        }
-
+        }  
         Invoke-SQLiteQuery -Database $ktdatabase -Query  "UPDATE `"main`".`"tblTasks`" SET `"Description`"=@Description WHERE `"Id`"=@Id;" -SqlParameters $sqlParameters | Out-Null
+
+        if ($todo.completed -ne ($todoInDb[5] -eq 'Completed')) {
+            Write-Verbose "Update To-Do description for $($todo.text)"
+            $sqlParameters = @{
+                Id       = $taskID
+                Category = $category
+            }
+            Invoke-SQLiteQuery -Database $ktdatabase -Query  "UPDATE `"main`".`"tblTasks`" SET `"Category`"=@Category WHERE `"Id`"=@Id;" -SqlParameters $sqlParameters | Out-Null
+        }
     }
 }
