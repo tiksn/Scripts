@@ -29,7 +29,21 @@ $todos = Get-HabiticaTask -Type todos
 foreach ($todo in $todos) {
     $description = $todo.description ?? ""
 
-    $todo.checklist
+    if ($todo.checklist) {
+        $description += [System.Environment]::NewLine
+
+        foreach ($subTask in $todo.checklist) {
+            $description += [System.Environment]::NewLine
+            if ($subTask.completed) {
+                $description += "✅"
+            }
+            else {
+                $description += "❎"
+            }
+            $description += " "
+            $description += $subTask.text
+        }
+    }
     
     $sqlParameters = @{
         BoardID = $habiticaBoardId
@@ -59,7 +73,14 @@ foreach ($todo in $todos) {
         Invoke-SQLiteQuery -Database $ktdatabase -Query "INSERT INTO `"main`".`"tblTasks`"(`"Id`",`"BoardID`",`"DateCreated`",`"Title`",`"Description`",`"Category`",`"ColumnIndex`",`"ColorKey`",`"Tags`",`"DueDate`",`"FinishDate`",`"TimeDue`",`"ReminderTime`",`"StartDate`") VALUES (NULL, @BoardID, @DateCreated, @Title, @Description, @Category, @ColumnIndex, @ColorKey, @Tags, @DueDate, @FinishDate, @TimeDue, @ReminderTime, @StartDate );" -SqlParameters $sqlParameters | Out-Null
     }
     else {
-        Write-Host "not null"
-        Write-Output $todoInDb
+        Write-Verbose "Update To-Do description for $($todo.text)"
+
+        $taskID = $todoInDb[0]
+        $sqlParameters = @{
+            Id          = $taskID
+            Description = $description
+        }
+
+        Invoke-SQLiteQuery -Database $ktdatabase -Query  "UPDATE `"main`".`"tblTasks`" SET `"Description`"=@Description WHERE `"Id`"=@Id;" -SqlParameters $sqlParameters | Out-Null
     }
 }
