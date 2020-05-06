@@ -35,10 +35,10 @@ foreach ($todo in $todos) {
         foreach ($subTask in $todo.checklist) {
             $description += [System.Environment]::NewLine
             if ($subTask.completed) {
-                $description += "✅"
+                $description += "✔"
             }
             else {
-                $description += "❎"
+                $description += "❌"
             }
             $description += " "
             $description += $subTask.text
