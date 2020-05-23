@@ -31,6 +31,15 @@ $allTodos = $todos + $completedTodos
 
 foreach ($todo in $allTodos) {
     $description = $todo.description ?? ""
+    $dueDate = ""
+    $timeDue = ""
+    $reminderTime = "None"
+
+    if (($null -ne $todo.date) -and ("" -ne $todo.date)) {
+        $dueDate = $todo.date.ToString("yyyy.MM.dd")
+        $timeDue = $todo.date.ToString("hh.mm.ss")
+        $reminderTime = "At Time of Due Date"
+    }
 
     if ($todo.checklist) {
         $description += [System.Environment]::NewLine
@@ -73,10 +82,10 @@ foreach ($todo in $allTodos) {
             ColumnIndex  = '0'
             ColorKey     = "Normal"
             Tags         = ""
-            DueDate      = ""
+            DueDate      = $dueDate
             FinishDate   = ""
-            TimeDue      = ""
-            ReminderTime = "None"
+            TimeDue      = $timeDue
+            ReminderTime = $reminderTime
             StartDate    = ""
         }
 
@@ -92,8 +101,29 @@ foreach ($todo in $allTodos) {
         }  
         Invoke-SQLiteQuery -Database $ktdatabase -Query  "UPDATE `"main`".`"tblTasks`" SET `"Description`"=@Description WHERE `"Id`"=@Id;" -SqlParameters $sqlParameters | Out-Null
 
+        Write-Verbose "Update To-Do Due Date for $($todo.text)"
+        $sqlParameters = @{
+            Id      = $taskID
+            DueDate = $dueDate
+        }
+        Invoke-SQLiteQuery -Database $ktdatabase -Query  "UPDATE `"main`".`"tblTasks`" SET `"DueDate`"=@DueDate WHERE `"Id`"=@Id;" -SqlParameters $sqlParameters | Out-Null
+
+        Write-Verbose "Update To-Do Time Due for $($todo.text)"
+        $sqlParameters = @{
+            Id      = $taskID
+            TimeDue = $timeDue
+        }
+        Invoke-SQLiteQuery -Database $ktdatabase -Query  "UPDATE `"main`".`"tblTasks`" SET `"TimeDue`"=@TimeDue WHERE `"Id`"=@Id;" -SqlParameters $sqlParameters | Out-Null
+
+        Write-Verbose "Update To-Do Reminder Time for $($todo.text)"
+        $sqlParameters = @{
+            Id           = $taskID
+            ReminderTime = $reminderTime
+        }
+        Invoke-SQLiteQuery -Database $ktdatabase -Query  "UPDATE `"main`".`"tblTasks`" SET `"ReminderTime`"=@ReminderTime WHERE `"Id`"=@Id;" -SqlParameters $sqlParameters | Out-Null
+
         if ($todo.completed -ne ($todoInDb[5] -eq 'Completed')) {
-            Write-Verbose "Update To-Do description for $($todo.text)"
+            Write-Verbose "Update To-Do Category for $($todo.text)"
             $sqlParameters = @{
                 Id       = $taskID
                 Category = $category
