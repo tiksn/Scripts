@@ -152,63 +152,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         Write-Host -Object $PSRelease.Version -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
         Write-Host -Object " version is available 🆕" -BackgroundColor White -ForegroundColor Black
     }
-
-    $isWorkDay = ($profileRunTime.DayOfWeek -ne [System.DayOfWeek]::Saturday) -and ($profileRunTime.DayOfWeek -ne [System.DayOfWeek]::Sunday)
-    $isWorkHour = ($profileRunTime.TimeOfDay -gt [System.TimeSpan]::FromHours(10) -and ($profileRunTime.TimeOfDay -lt [System.TimeSpan]::FromHours(20)))
-
-    if (-not $isWorkDay -or -not $isWorkHour) {
-        foreach ($dueDaily in $ProfileCache.Habitica.DueDailies) {
-            Write-Host -Object "🍒 " -NoNewline
-            Write-Host -Object $dueDaily.text -NoNewline
-            if ($dueDaily.notes) {
-                Write-Host -Object ' (' -NoNewline
-                Write-Host -Object $dueDaily.notes -NoNewline
-                Write-Host -Object ')' -NoNewline
-            }
-            Write-Host -Object " 🍒"
-
-            $dueDailySubTasks = $dueDaily.checklist | Where-Object { -not $_.completed }
-            foreach ($dueDailySubTask in $dueDailySubTasks) {
-                Write-Host -Object "    🍒 " -NoNewline
-                Write-Host -Object $dueDailySubTask.text -NoNewline
-                Write-Host -Object " 🍒"
-            }
-        }
-
-        # order by $dueHabit.value or $dueHabit.priority
-        $topDueHabits = $ProfileCache.Habitica.DueHabits | Sort-Object -Property value -Descending | Select-Object -First 5
-        foreach ($dueHabit in $topDueHabits) {
-            Write-Host -Object "👑 " -NoNewline
-            Write-Host -Object $dueHabit.text -NoNewline
-            if ($dueHabit.notes) {
-                Write-Host -Object ' (' -NoNewline
-                Write-Host -Object $dueHabit.notes -NoNewline
-                Write-Host -Object ')' -NoNewline
-            }
-        
-            Write-Host -Object " 👑"
-        }
-
-        # order by $dueHabit.value or $dueHabit.priority
-        $topDueToDos = $ProfileCache.Habitica.DueToDos | Sort-Object -Property value -Descending | Select-Object -First 5
-        foreach ($dueToDo in $topDueToDos) {
-            Write-Host -Object "🏆 " -NoNewline
-            Write-Host -Object $dueToDo.text -NoNewline
-            if ($dueToDo.notes) {
-                Write-Host -Object ' (' -NoNewline
-                Write-Host -Object $dueToDo.notes -NoNewline
-                Write-Host -Object ')' -NoNewline
-            }
-            Write-Host -Object " 🏆"
-
-            $dueToDoSubTasks = $dueToDo.checklist | Where-Object { -not $_.completed }
-            foreach ($dueToDoSubTask in $dueToDoSubTasks) {
-                Write-Host -Object "    🏆 " -NoNewline
-                Write-Host -Object $dueToDoSubTask.text -NoNewline
-                Write-Host -Object " 🏆"
-            }
-        }
-    }
     
     Show-Calendar
     Write-Host -Object " "
