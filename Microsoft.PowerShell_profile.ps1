@@ -252,6 +252,8 @@ $TranscriptDate = Get-Date -Format "yyyy-MM-dd--hh-mm-ss"
 $instanceId = $Host.InstanceId
 $TranscriptFilePath = Join-Path -Path $PowerShellTranscriptsPath -ChildPath "$TranscriptDate $instanceId.txt"
 
+Set-PSReadLineOption -PredictionSource History
+
 Start-Transcript -Path $TranscriptFilePath -Append
 
 # Invoke-Expression (&starship init powershell)
