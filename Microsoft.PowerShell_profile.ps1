@@ -46,8 +46,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
 
     Start-ThreadJob -Name 'UpdatePowerShellCache' -InitializationScript $readCache -ScriptBlock {
         if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
-            $ProfileCache.Saved = Get-Date
-            
             $nationalBankOfUkraineJob = Start-ThreadJob -ScriptBlock {
                 $xml = New-Object xml
 
@@ -135,6 +133,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             }
 
             if ($saveCache) {
+                $ProfileCache.Saved = Get-Date
                 $ProfileCache | Export-Clixml -Path $PowerShellCachePath
             }
         }
