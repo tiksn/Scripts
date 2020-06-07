@@ -21,10 +21,10 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         }
         else {
             $ProfileCache = [PSCustomObject]@{
-                Release        = $null
-                ReleasePreview = $null
-                Saved          = $null
-                Habitica       = [PSCustomObject]@{
+                Saved                 = $null
+                Release               = $null
+                ReleasePreview        = $null
+                Habitica              = [PSCustomObject]@{
                     DueDailies      = $null
                     DueDailiesCount = $null
                     DueToDos        = $null
@@ -33,7 +33,11 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
                     DueHabitsCount  = $null
                     HabiticaUser    = $null
                 }
-                AllCommands    = $null
+                AllCommands           = $null
+                NationalBankOfUkraine = [PSCustomObject]@{
+                    ExchangeRates           = $null
+                    YesterdaysExchangeRates = $null
+                }
             }
         }
     }
@@ -41,6 +45,24 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     Invoke-Command -ScriptBlock $readCache -NoNewScope
 
     Start-ThreadJob -Name 'UpdatePowerShellCache' -InitializationScript $readCache -ScriptBlock {
+        if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
+            Start-ThreadJob -ScriptBlock {
+                $xml = New-Object xml
+
+                $xml.Load('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange')
+                $exchangeRates = $xml.exchange | Select-Object -ExpandProperty currency
+
+                $yesterdaysDatePattern = (Get-Date).AddDays(-1).ToString("yyyyMMdd")
+
+                $xml.Load("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=$yesterdaysDatePattern")
+                $yesterdaysExchangeRates = $xml.exchange | Select-Object -ExpandProperty currency
+
+                Write-Output [PSCustomObject]@{
+                    ExchangeRates           = $exchangeRates
+                    YesterdaysExchangeRates = $yesterdaysExchangeRates
+                }
+            }
+        }
     } | Out-Null
 
     function GetSignedChange {
