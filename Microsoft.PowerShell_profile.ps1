@@ -203,16 +203,25 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     }
 
     Write-Host -Object "⚒ " -NoNewline
-    Write-Host -Object " $($ProfileCache.Habitica.HabiticaUser.stats.lvl) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-    Write-Host -Object " Level " -NoNewline
-    Write-Host -Object " $(($ProfileCache.Habitica.HabiticaUser.stats.gp.ToString("N0"))) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-    Write-Host -Object " Gold " -NoNewline
-    Write-Host -Object " $($ProfileCache.Habitica.DueHabitsCount) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-    Write-Host -Object " Habits (pending) " -NoNewline
-    Write-Host -Object " $($ProfileCache.Habitica.DueDailiesCount) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-    Write-Host -Object " Dailies (left) " -NoNewline
-    Write-Host -Object " $($ProfileCache.Habitica.DueToDoCount) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-    Write-Host -Object " To-Dos ⚒"
+    if ($null -ne $ProfileCache.Habitica.HabiticaUser) {
+        Write-Host -Object " $($ProfileCache.Habitica.HabiticaUser.stats.lvl) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+        Write-Host -Object " Level " -NoNewline
+        Write-Host -Object " $(($ProfileCache.Habitica.HabiticaUser.stats.gp.ToString("N0"))) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+        Write-Host -Object " Gold " -NoNewline
+    }
+    if ($null -ne $ProfileCache.Habitica.DueHabitsCount) {
+        Write-Host -Object " $($ProfileCache.Habitica.DueHabitsCount) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+        Write-Host -Object " Habits (pending) " -NoNewline
+    }
+    if ($null -ne $ProfileCache.Habitica.DueDailiesCount) {
+        Write-Host -Object " $($ProfileCache.Habitica.DueDailiesCount) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+        Write-Host -Object " Dailies (left) " -NoNewline
+    }
+    if ($null -ne $ProfileCache.Habitica.DueToDoCount) {
+        Write-Host -Object " $($ProfileCache.Habitica.DueToDoCount) " -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+        Write-Host -Object " To-Dos" -NoNewline
+    }
+    Write-Host -Object " ⚒"
 
     if ($null -eq $PSVersionTable.PSVersion.PreReleaseLabel) {
         $PSRelease = $ProfileCache.Release
