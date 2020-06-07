@@ -46,7 +46,9 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
 
     Start-ThreadJob -Name 'UpdatePowerShellCache' -InitializationScript $readCache -ScriptBlock {
         if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
-            Start-ThreadJob -ScriptBlock {
+            $ProfileCache.Saved = Get-Date
+            
+            $nationalBankOfUkraineJob = Start-ThreadJob -ScriptBlock {
                 $xml = New-Object xml
 
                 $xml.Load('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange')
@@ -57,10 +59,62 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
                 $xml.Load("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=$yesterdaysDatePattern")
                 $yesterdaysExchangeRates = $xml.exchange | Select-Object -ExpandProperty currency
 
-                Write-Output [PSCustomObject]@{
+                [PSCustomObject]@{
                     ExchangeRates           = $exchangeRates
                     YesterdaysExchangeRates = $yesterdaysExchangeRates
-                }
+                } | Write-Output
+            }
+
+            $habiticaJob = Start-ThreadJob -ScriptBlock {
+                $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
+                Connect-Habitica -Path $habiticaCredentialsFilePath
+
+                $dailys = Get-HabiticaTask -Type dailys
+                $todos = Get-HabiticaTask -Type todos
+                $habits = Get-HabiticaTask -Type habits
+
+                [PSCustomObject]@{
+                    DueDailies      = $dailys | Where-Object { $_.IsDue -and (-not $_.completed) } 
+                    DueDailiesCount = ($ProfileCache.Habitica.DueDailies | Measure-Object).Count
+                    DueToDos        = $todos
+                    DueToDoCount    = ($ProfileCache.Habitica.DueToDos | Measure-Object).Count
+                    DueHabits       = $habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) }
+                    DueHabitsCount  = ($ProfileCache.Habitica.DueHabits | Measure-Object).Count
+                    HabiticaUser    = Get-HabiticaUser
+                } | Write-Output
+            }
+
+            $allCommandsJob = Start-ThreadJob -ScriptBlock {
+                $allCommands = Get-Command * | Select-Object -Unique
+                Write-Output $allCommands
+            }
+
+            $saveCache = $true
+
+            try {
+                $ProfileCache.NationalBankOfUkraine = Receive-Job $nationalBankOfUkraineJob -Wait
+            }
+            catch {
+                $saveCache = $false
+            }
+
+            try {
+                $ProfileCache.Habitica = Receive-Job $habiticaJob -Wait
+            }
+            catch {
+                $saveCache = $false
+            }
+
+            try {
+                $ProfileCache.AllCommands = Receive-Job $allCommandsJob -Wait
+            }
+            catch {
+                $saveCache = $false
+            }
+
+            
+            if ($saveCache) {
+                $ProfileCache | Export-Clixml -Path $PowerShellCachePath
             }
         }
     } | Out-Null
@@ -108,53 +162,31 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         }
     }
 
-    $updateAllCommands = $false
     if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
         $ProfileCache.Release = Get-PSReleaseCurrent
         $ProfileCache.ReleasePreview = Get-PSReleaseCurrent -Preview
-        $ProfileCache.Saved = Get-Date
+        
 
-        if ($null -eq $ProfileCache.AllCommands) {
-            $ProfileCache.AllCommands = Get-Command * | Select-Object -Unique
-        }
-        else {
-            $updateAllCommands = $true
-        }
+    }
 
-        $SaveCache = $true
+    if (($null -ne $ProfileCache.NationalBankOfUkraine.ExchangeRates) -and ($null -ne $ProfileCache.NationalBankOfUkraine.YesterdaysExchangeRates)) {
+        $usduahToday = $ProfileCache.NationalBankOfUkraine.ExchangeRates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
+        $euruahToday = $ProfileCache.NationalBankOfUkraine.ExchangeRates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
 
-        try {
-            $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
-            Connect-Habitica -Path $habiticaCredentialsFilePath
+        $usduahYesterday = $ProfileCache.NationalBankOfUkraine.YesterdaysExchangeRates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
+        $euruahYesterday = $ProfileCache.NationalBankOfUkraine.YesterdaysExchangeRates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
 
-            $dailys = Get-HabiticaTask -Type dailys
-            $todos = Get-HabiticaTask -Type todos
-            $habits = Get-HabiticaTask -Type habits
+        $usduahDelta = $usduahToday - $usduahYesterday
+        $euruahDelta = $euruahToday - $euruahYesterday
 
-            $ProfileCache.Habitica.DueDailies = $dailys | Where-Object { $_.IsDue -and (-not $_.completed) } 
-            $ProfileCache.Habitica.DueDailiesCount = ($ProfileCache.Habitica.DueDailies | Measure-Object).Count
-            $ProfileCache.Habitica.DueToDos = $todos
-            $ProfileCache.Habitica.DueToDoCount = ($ProfileCache.Habitica.DueToDos | Measure-Object).Count
-            $ProfileCache.Habitica.DueHabits = $habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) }
-            $ProfileCache.Habitica.DueHabitsCount = ($ProfileCache.Habitica.DueHabits | Measure-Object).Count
-            $ProfileCache.Habitica.HabiticaUser = Get-HabiticaUser
-        }
-        catch {
-            $SaveCache = $false
-        }
+        $usduahFluctuation = GetCurrencyFluctuation -total $usduahToday -delta $usduahDelta
+        $euruahFluctuation = GetCurrencyFluctuation -total $euruahToday -delta $euruahDelta
 
-        if ($SaveCache) {
-            $ProfileCache | Export-Clixml $PowerShellCachePath
+        $usduahDelta = GetSignedChange ( [math]::Round($usduahDelta, 2) )
+        $euruahDelta = GetSignedChange ( [math]::Round($euruahDelta, 2) )
 
-            if ($updateAllCommands) {
-                Start-Job {
-                    $PowerShellCachePath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
-                    $ProfileCache = Import-Clixml -Path $PowerShellCachePath
-                    $ProfileCache.AllCommands = Get-Command * | Select-Object -Unique
-                    $ProfileCache | Export-Clixml $PowerShellCachePath
-                } | Out-Null
-            }
-        }
+        Write-Host -Object "💵 USD/UAH $usduahToday $($usduahFluctuation.Sign) $($usduahFluctuation.Percentage) ($usduahDelta) 💵" -BackgroundColor Black -ForegroundColor DarkGreen
+        Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euruahFluctuation.Percentage) ($euruahDelta) 💶" -BackgroundColor Black -ForegroundColor DarkGreen
     }
 
     Write-Host -Object "⚒ " -NoNewline
@@ -185,17 +217,19 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     Show-Calendar
     Write-Host -Object " "
 
-    $randomCommand = $ProfileCache.AllCommands | Get-Random
+    if ($ProfileCache.AllCommands) {
+        $randomCommand = $ProfileCache.AllCommands | Get-Random
 
-    Write-Host -Object "⌨ " -NoNewline
-    Write-Host -Object $randomCommand.Name -NoNewline -ForegroundColor Black -BackgroundColor White
-    Write-Host -Object ' ' -NoNewline
-    Write-Host -Object $randomCommand.CommandType.ToString() -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-    Write-Host -Object ' ' -NoNewline
-    Write-Host -Object $randomCommand.Source -NoNewline
-    Write-Host -Object " ⌨"
-    Write-Host -Object " "
-
+        Write-Host -Object "⌨ " -NoNewline
+        Write-Host -Object $randomCommand.Name -NoNewline -ForegroundColor Black -BackgroundColor White
+        Write-Host -Object ' ' -NoNewline
+        Write-Host -Object $randomCommand.CommandType.ToString() -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+        Write-Host -Object ' ' -NoNewline
+        Write-Host -Object $randomCommand.Source -NoNewline
+        Write-Host -Object " ⌨"
+        Write-Host -Object " "
+    }
+    
     if ($randomCommand.CommandType -ne [System.Management.Automation.CommandTypes]::Application) {
         # Get-Command -Name $randomCommand.Name -Syntax
     }
