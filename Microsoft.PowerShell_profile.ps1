@@ -21,10 +21,10 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         }
         else {
             $ProfileCache = [PSCustomObject]@{
-                Saved                 = $null
-                Release               = $null
-                ReleasePreview        = $null
-                Habitica              = [PSCustomObject]@{
+                Saved                     = $null
+                Release                   = $null
+                ReleasePreview            = $null
+                Habitica                  = [PSCustomObject]@{
                     DueDailies      = $null
                     DueDailiesCount = $null
                     DueToDos        = $null
@@ -33,11 +33,12 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
                     DueHabitsCount  = $null
                     HabiticaUser    = $null
                 }
-                AllCommands           = $null
-                NationalBankOfUkraine = [PSCustomObject]@{
+                AllCommands               = $null
+                NationalBankOfUkraine     = [PSCustomObject]@{
                     ExchangeRates           = $null
                     YesterdaysExchangeRates = $null
                 }
+                CentralBankOfArmeniaRates = $null
             }
         }
     }
@@ -61,6 +62,20 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
                     ExchangeRates           = $exchangeRates
                     YesterdaysExchangeRates = $yesterdaysExchangeRates
                 } | Write-Output
+            }
+
+            $centralBankOfArmeniaJob = Start-ThreadJob -ScriptBlock {
+                $response = Invoke-RestMethod 'https://www.cba.am/_layouts/rssreader.aspx?rss=280F57B8-763C-4EE4-90E0-8136C13E47DA' -Method 'GET' -Headers $headers -Body $body
+                $response = $response | Select-Object -ExpandProperty title
+                $rates = $response | ForEach-Object {
+                    $parts = $_ -split '-' | ForEach-Object { $_.Trim() }
+                    [PSCustomObject]@{
+                        Code = $parts[0]
+                        Rate = ($parts[2] -as [decimal]) / ($parts[1] -as [decimal])
+                    }
+                }
+
+                Write-Output $rates
             }
 
             $habiticaJob = Start-ThreadJob -ScriptBlock {
@@ -99,6 +114,13 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
 
             try {
                 $ProfileCache.NationalBankOfUkraine = Receive-Job $nationalBankOfUkraineJob -Wait
+            }
+            catch {
+                $saveCache = $false
+            }
+
+            try {
+                $ProfileCache.CentralBankOfArmeniaRates = Receive-Job $centralBankOfArmeniaJob -Wait
             }
             catch {
                 $saveCache = $false
@@ -198,11 +220,21 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         $usduahDelta = GetSignedChange ( [math]::Round($usduahDelta, 2) )
         $euruahDelta = GetSignedChange ( [math]::Round($euruahDelta, 2) )
 
-        Write-Host -Object "💵 USD/UAH $usduahToday $($usduahFluctuation.Sign) $($usduahFluctuation.Percentage) ($usduahDelta) 💵" -BackgroundColor Black -ForegroundColor DarkGreen -NoNewline
+        Write-Host -Object "💵 USD/UAH $usduahToday $($usduahFluctuation.Sign) $($usduahFluctuation.Percentage) ($usduahDelta)" -BackgroundColor Black -ForegroundColor DarkGreen -NoNewline
         Write-Host -Object ' ' -NoNewline
-        Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euruahFluctuation.Percentage) ($euruahDelta) 💶" -BackgroundColor Black -ForegroundColor DarkGreen -NoNewline
-        Write-Host -Object ' '
+        Write-Host -Object "💶 EUR/UAH $euruahToday $($euruahFluctuation.Sign) $($euruahFluctuation.Percentage) ($euruahDelta)" -BackgroundColor Black -ForegroundColor DarkGreen -NoNewline
+        Write-Host -Object ' ' -NoNewline
     }
+    if ($null -ne $ProfileCache.CentralBankOfArmeniaRates) {
+        $usdamdToday = $ProfileCache.CentralBankOfArmeniaRates | Where-Object { $_.Code -eq 'USD' } | Select-Object -ExpandProperty Rate | ForEach-Object { [math]::Round($_, 2) }
+        $euramdToday = $ProfileCache.CentralBankOfArmeniaRates | Where-Object { $_.Code -eq 'EUR' } | Select-Object -ExpandProperty Rate | ForEach-Object { [math]::Round($_, 2) }
+
+        Write-Host -Object "💵 USD/AMD $usdamdToday" -BackgroundColor Black -ForegroundColor DarkGreen -NoNewline
+        Write-Host -Object ' ' -NoNewline
+        Write-Host -Object "💶 EUR/AMD $euramdToday" -BackgroundColor Black -ForegroundColor DarkGreen -NoNewline
+        Write-Host -Object ' ' -NoNewline
+    }
+    Write-Host -Object ' '
 
     Write-Host -Object "⚒ " -NoNewline
     if ($null -ne $ProfileCache.Habitica.HabiticaUser) {
