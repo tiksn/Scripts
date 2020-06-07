@@ -13,29 +13,36 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlue
     Write-Host -Object ' '
 
-    $PowerShellCachePath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
+    [scriptblock]$readCache = {
+        $PowerShellCachePath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
 
-    if (Test-Path -Path $PowerShellCachePath) {
-        $ProfileCache = Import-Clixml -Path $PowerShellCachePath
-    }
-    else {
-        $ProfileCache = [PSCustomObject]@{
-            Release        = $null
-            ReleasePreview = $null
-            Saved          = $null
-            Habitica       = [PSCustomObject]@{
-                DueDailies      = $null
-                DueDailiesCount = $null
-                DueToDos        = $null
-                DueToDoCount    = $null
-                DueHabits       = $null
-                DueHabitsCount  = $null
-                HabiticaUser    = $null
+        if (Test-Path -Path $PowerShellCachePath) {
+            $ProfileCache = Import-Clixml -Path $PowerShellCachePath
+        }
+        else {
+            $ProfileCache = [PSCustomObject]@{
+                Release        = $null
+                ReleasePreview = $null
+                Saved          = $null
+                Habitica       = [PSCustomObject]@{
+                    DueDailies      = $null
+                    DueDailiesCount = $null
+                    DueToDos        = $null
+                    DueToDoCount    = $null
+                    DueHabits       = $null
+                    DueHabitsCount  = $null
+                    HabiticaUser    = $null
+                }
+                AllCommands    = $null
             }
-            AllCommands    = $null
         }
     }
-    
+
+    Invoke-Command -ScriptBlock $readCache -NoNewScope
+
+    Start-ThreadJob -Name 'UpdatePowerShellCache' -InitializationScript $readCache -ScriptBlock {
+    } | Out-Null
+
     function GetSignedChange {
         param (
             $change
