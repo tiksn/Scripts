@@ -89,6 +89,14 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
                 Write-Output $allCommands
             }
 
+            $pwshRelease = Start-ThreadJob -ScriptBlock {
+                Get-PSReleaseCurrent | Write-Output 
+            }
+
+            $pwshPreviewRelease = Start-ThreadJob -ScriptBlock {
+                Get-PSReleaseCurrent -Preview | Write-Output 
+            }
+
             $saveCache = $true
 
             try {
@@ -112,7 +120,20 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
                 $saveCache = $false
             }
 
+            try {
+                $ProfileCache.Release = Receive-Job $pwshRelease -Wait
+            }
+            catch {
+                $saveCache = $false
+            }
             
+            try {
+                $ProfileCache.ReleasePreview = Receive-Job $pwshPreviewRelease -Wait
+            }
+            catch {
+                $saveCache = $false
+            }
+
             if ($saveCache) {
                 $ProfileCache | Export-Clixml -Path $PowerShellCachePath
             }
@@ -160,13 +181,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             Sign       = $sign
             Percentage = $percentage
         }
-    }
-
-    if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
-        $ProfileCache.Release = Get-PSReleaseCurrent
-        $ProfileCache.ReleasePreview = Get-PSReleaseCurrent -Preview
-        
-
     }
 
     if (($null -ne $ProfileCache.NationalBankOfUkraine.ExchangeRates) -and ($null -ne $ProfileCache.NationalBankOfUkraine.YesterdaysExchangeRates)) {
