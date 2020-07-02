@@ -23,6 +23,7 @@ if ($IsWindows) {
     Write-Progress -Activity "Updating Scoop packages" -Id 1478576163
     if ($PSCmdlet.ShouldProcess("Scoop packages", "Update all packages")) {
         scoop update
+        scoop update "*"
     }
     
     Write-Progress -Activity "Updating Windows" -Id 1478576163
