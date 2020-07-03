@@ -117,6 +117,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             }
             catch {
                 $saveCache = $false
+                Write-Error $_
             }
 
             try {
@@ -124,6 +125,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             }
             catch {
                 $saveCache = $false
+                Write-Error $_
             }
 
             try {
@@ -131,6 +133,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             }
             catch {
                 $saveCache = $false
+                Write-Error $_
             }
 
             try {
@@ -138,6 +141,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             }
             catch {
                 $saveCache = $false
+                Write-Error $_
             }
 
             try {
@@ -145,6 +149,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             }
             catch {
                 $saveCache = $false
+                Write-Error $_
             }
             
             try {
@@ -152,6 +157,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             }
             catch {
                 $saveCache = $false
+                Write-Error $_
             }
 
             if ($saveCache) {
