@@ -10,12 +10,12 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     $formattedDate = $profileRunTime.ToString("f")
     $formattedDate = "⌚ $(($formattedDate | Out-String).trim()) ⌚"
 
-    $features = Get-Secret -Name 'PowerShellProfileFeatures'
-
     Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlue
     Write-Host -Object ' '
 
-    [scriptblock]$readCache = {
+    [scriptblock]$initialize = {
+        $features = Get-Secret -Name 'PowerShellProfileFeatures'
+
         $PowerShellCachePath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
 
         if (Test-Path -Path $PowerShellCachePath) {
@@ -45,9 +45,9 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         }
     }
 
-    Invoke-Command -ScriptBlock $readCache -NoNewScope
+    Invoke-Command -ScriptBlock $initialize -NoNewScope
 
-    Start-ThreadJob -Name 'UpdatePowerShellCache' -InitializationScript $readCache -ScriptBlock {
+    Start-ThreadJob -Name 'UpdatePowerShellCache' -InitializationScript $initialize -ScriptBlock {
         if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
             if ($features.NationalBankOfUkraineRates) {
                 $nationalBankOfUkraineJob = Start-ThreadJob -ScriptBlock {
