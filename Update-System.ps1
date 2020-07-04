@@ -12,6 +12,8 @@ Write-Progress -Activity "Updating PowerShell Help files" -Id 1478576163
 Update-Help
 
 if ($IsWindows) {
+    Set-Alias -Name 'PythonAlias' -Value 'py'
+
     Write-Progress -Activity "Updating Defender signatures" -Id 1478576163
     Update-MpSignature
 
@@ -31,6 +33,8 @@ if ($IsWindows) {
 }
 
 if ($IsLinux) {
+    Set-Alias -Name 'PythonAlias' -Value 'python3'
+
     $release = Get-Content -Path /etc/os-release
     $release = $release.Split([Environment]::NewLine) | Where-Object { $_.StartsWith("ID=") }
     $release = $release.Substring(3)
@@ -69,8 +73,21 @@ if ($?) {
 
     foreach ($package in $packages) {
         if ($PSCmdlet.ShouldProcess("Rust Cargo Crate $package", "Update Rust Cargo Crate")) {
-            Write-Progress -Activity "Updating all Rust Cargo Crates" -Id 1478576163 -CurrentOperation "Installing Crate $package ..."
+            Write-Progress -Activity "Updating Rust Cargo Crate $package" -Id 1478576163 -CurrentOperation "Installing Crate $package ..."
             cargo install $package
+        }
+    }
+}
+
+Write-Progress -Activity "Updating all Python PIP packages" -Id 1478576163
+
+$installList = PythonAlias -m pip freeze
+if ($?) {
+    $packages = $installList | ForEach-Object { $_.split('==')[0] }
+    foreach ($package in $packages) {
+        if ($PSCmdlet.ShouldProcess("Python PIP package $package", "Update Python PIP package")) {
+            Write-Progress -Activity "Updating Python PIP package $package" -Id 1478576163 -CurrentOperation "Installing Crate $package ..."
+            PythonAlias -m pip install --upgrade $package
         }
     }
 }
