@@ -86,7 +86,7 @@ if ($?) {
     $packages = $installList | ForEach-Object { $_.split('==')[0] }
     foreach ($package in $packages) {
         if ($PSCmdlet.ShouldProcess("Python PIP package $package", "Update Python PIP package")) {
-            Write-Progress -Activity "Updating Python PIP package $package" -Id 1478576163 -CurrentOperation "Installing Crate $package ..."
+            Write-Progress -Activity "Updating Python PIP package $package" -Id 1478576163 -CurrentOperation "Installing Python PIP package $package ..."
             PythonAlias -m pip install --upgrade $package
         }
     }
