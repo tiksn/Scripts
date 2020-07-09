@@ -106,7 +106,15 @@ function UpdateDoltRepositories {
         $Path
     )
 
-    throw 'not implemented'
+    $subDirectories = Get-ChildItem -Path $Path -Directory
+    foreach ($subDirectory in $subDirectories) {
+        if (IsDoltRepository -Path $subDirectory) {
+            UpdateDoltRepository -Path $subDirectory
+        }
+        else {
+            UpdateDoltRepositories -Path $subDirectory
+        }
+    }
 }
 
 $parentDirectory = Get-Item $Path
