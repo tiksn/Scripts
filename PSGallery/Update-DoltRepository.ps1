@@ -59,6 +59,29 @@ function IsDoltRepository {
         [string]
         $Path
     )
+    $doltDirectoryPath = Join-Path -Path $Path -ChildPath ".dolt"
+    if (Test-Path -Path $doltDirectoryPath) {
+        $doltItem = Get-Item $doltDirectoryPath
+
+        if ($doltItem.PSIsContainer) {
+            return $true
+        }
+        else {
+            return $false
+        }
+    }
+    else {
+        return $false
+    }
+}
+
+function UpdateDoltRepository {
+    param (
+        [Parameter(Mandatory = $true, HelpMessage = "Path to one locations.")]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Path
+    )
     
 }
 
@@ -68,7 +91,15 @@ if ($null -eq $parentDirectory) {
 }
 else {
     if ($parentDirectory.PSIsContainer) {
-
+        if (IsDoltRepository -Path $parentDirectory) {
+            UpdateDoltRepository -Path $parentDirectory
+        }
+        elseif ($Recurse) {
+            throw 'not implemented'
+        }
+        else {
+            throw 'not implemented'
+        }
     }
     else {
         Write-Error -Message "Path $Path is not a directory." -Category InvalidArgument
