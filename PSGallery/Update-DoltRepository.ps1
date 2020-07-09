@@ -83,6 +83,30 @@ function UpdateDoltRepository {
         $Path
     )
     
+    Push-Location
+    try {
+        Set-Location $Path
+        Write-Verbose -Message "Changed working directory to $Path"
+
+        dolt fetch
+        if ($?) {
+            dolt pull
+        }
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function UpdateDoltRepositories {
+    param (
+        [Parameter(Mandatory = $true, HelpMessage = "Path to one locations.")]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Path
+    )
+
+    throw 'not implemented'
 }
 
 $parentDirectory = Get-Item $Path
@@ -95,7 +119,7 @@ else {
             UpdateDoltRepository -Path $parentDirectory
         }
         elseif ($Recurse) {
-            throw 'not implemented'
+            UpdateDoltRepositories -Path $parentDirectory
         }
         else {
             Write-Error -Message "$Path is not a dolt repository directory." -Category InvalidArgument
