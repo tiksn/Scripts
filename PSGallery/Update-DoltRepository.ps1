@@ -38,7 +38,7 @@
  Update one or more Dolt repositories 
 
 #>
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
 Param(
     # Path to the folder that contains one ore more dolt repositories
     [Parameter()]
@@ -80,7 +80,11 @@ function UpdateDoltRepository {
         [Parameter(Mandatory = $true, HelpMessage = "Path to one locations.")]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Path
+        $Path,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [object]
+        $ScriptCmdlet
     )
     
     Push-Location
@@ -90,10 +94,13 @@ function UpdateDoltRepository {
 
         dolt fetch
         if ($?) {
-            dolt pull
+            if ($ScriptCmdlet.ShouldProcess($Path, "Pull Dolt remote changes")) {
+                dolt pull
+            }
         }
     }
     finally {
+        
         Pop-Location
     }
 }
@@ -103,16 +110,20 @@ function UpdateDoltRepositories {
         [Parameter(Mandatory = $true, HelpMessage = "Path to one locations.")]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Path
+        $Path,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [object]
+        $ScriptCmdlet
     )
 
     $subDirectories = Get-ChildItem -Path $Path -Directory
     foreach ($subDirectory in $subDirectories) {
         if (IsDoltRepository -Path $subDirectory) {
-            UpdateDoltRepository -Path $subDirectory
+            UpdateDoltRepository -Path $subDirectory -ScriptCmdlet $ScriptCmdlet
         }
         else {
-            UpdateDoltRepositories -Path $subDirectory
+            UpdateDoltRepositories -Path $subDirectory -ScriptCmdlet $ScriptCmdlet
         }
     }
 }
@@ -122,12 +133,13 @@ if ($null -eq $parentDirectory) {
     Write-Error -Message "Path $Path is not accessible." -Category ObjectNotFound
 }
 else {
+    $ScriptCmdlet = $PSCmdlet
     if ($parentDirectory.PSIsContainer) {
         if (IsDoltRepository -Path $parentDirectory) {
-            UpdateDoltRepository -Path $parentDirectory
+            UpdateDoltRepository -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet
         }
         elseif ($Recurse) {
-            UpdateDoltRepositories -Path $parentDirectory
+            UpdateDoltRepositories -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet
         }
         else {
             Write-Error -Message "$Path is not a dolt repository directory." -Category InvalidArgument
