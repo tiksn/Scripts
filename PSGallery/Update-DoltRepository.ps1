@@ -40,11 +40,27 @@
 #>
 [CmdletBinding()]
 Param(
-    # Parameter help description
+    # Path to the folder that contains one ore more dolt repositories
     [Parameter()]
     [string]
-    $Path = (Get-Location).Path
+    $Path = (Get-Location).Path,
+    # Gets the Dolt repositories in the specified locations and in all sub-directories.
+    [Parameter()]
+    [switch]
+    $Recurse
 )
+
+# Update-DoltRepository
+
+function IsDoltRepository {
+    param (
+        [Parameter(Mandatory = $true, HelpMessage = "Path to one locations.")]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Path
+    )
+    
+}
 
 $parentDirectory = Get-Item $Path
 if ($null -eq $parentDirectory) {
@@ -54,6 +70,7 @@ else {
     if ($parentDirectory.PSIsContainer) {
 
     }
-    Write-Error -Message "Path $Path is not a directory." -Category InvalidArgument
+    else {
+        Write-Error -Message "Path $Path is not a directory." -Category InvalidArgument
+    }
 }
-
