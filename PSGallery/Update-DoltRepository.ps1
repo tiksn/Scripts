@@ -98,7 +98,7 @@ else {
             throw 'not implemented'
         }
         else {
-            throw 'not implemented'
+            Write-Error -Message "$Path is not a dolt repository directory." -Category InvalidArgument
         }
     }
     else {
