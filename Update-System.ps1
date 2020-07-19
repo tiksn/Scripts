@@ -17,6 +17,9 @@ if ($IsWindows) {
     Write-Progress -Activity "Updating Defender signatures" -Id 1478576163
     Update-MpSignature
 
+    Write-Progress -Activity "Updating Windows Package Manager all sources" -Id 1478576163
+    winget source update
+
     Write-Progress -Activity "Updating Chocolatey packages" -Id 1478576163
     if ($PSCmdlet.ShouldProcess("Chocolatey packages", "Update all packages")) {
         choco upgrade --confirm all
