@@ -255,6 +255,17 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     }
 
     if ($null -ne $ProfileCache.Habitica.HabiticaUser) {
+        switch ($ProfileCache.Habitica.HabiticaUser.stats.hp) {
+            { $_ -lt 8 } { Write-Host -Object "🖤" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
+            { $_ -lt 15 } { Write-Host -Object "🤎" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
+            { $_ -lt 22 } { Write-Host -Object "🧡" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
+            { $_ -lt 29 } { Write-Host -Object "💜" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
+            { $_ -lt 36 } { Write-Host -Object "💛" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
+            { $_ -lt 43 } { Write-Host -Object "💚" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
+            Default { Write-Host -Object "💙" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta }
+        }
+        Write-Host -Object " $($ProfileCache.Habitica.HabiticaUser.stats.hp.ToString("N0")) / 50" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+        Write-Host -Object " " -NoNewline
         Write-Host -Object "🐱‍🏍 $($ProfileCache.Habitica.HabiticaUser.stats.lvl)" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
         Write-Host -Object " " -NoNewline
         Write-Host -Object "🥇 $($ProfileCache.Habitica.HabiticaUser.stats.gp.ToString("N0"))" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
