@@ -6,12 +6,8 @@ Import-Module -Name PSReleaseTools
 Import-Module -Name PowerShellHumanizer
 
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
-    $profileRunTime = Get-Date
-    $formattedDate = $profileRunTime.ToString("f")
-    $formattedDate = "⌚ $(($formattedDate | Out-String).trim()) ⌚"
-
-    Write-Host -Object $formattedDate -BackgroundColor Cyan -ForegroundColor DarkBlue
-    Write-Host -Object ' '
+    Show-Calendar
+    Write-Host -Object " "
 
     [scriptblock]$initialize = {
         $features = Get-Secret -Name 'PowerShellProfileFeatures'
@@ -300,10 +296,9 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         Write-Host -Object $PSRelease.Version -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
         Write-Host -Object " version is available 🆕" -BackgroundColor White -ForegroundColor Black
     }
-    
-    Show-Calendar
-    Write-Host -Object " "
 
+    Write-Host -Object " "
+    
     if ($ProfileCache.AllCommands) {
         $randomCommand = $ProfileCache.AllCommands | Get-Random
 
