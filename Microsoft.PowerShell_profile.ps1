@@ -361,12 +361,10 @@ function prompt {
         Write-Host " " -NoNewline
     }
     
-    Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor DarkBlue
-    Write-Host -Object " " -NoNewline
-
     Try {
         $repoStatus = Get-RepositoryStatus
-        
+        Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor Black
+        Write-Host -Object " " -NoNewline
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
         Write-VcsStatus
         Write-Host
@@ -382,6 +380,8 @@ function prompt {
     }
     Catch {
         $repoStatus = $null;
+        Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor Black
+        Write-Host -Object " " -NoNewline
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
         Write-Host
 
