@@ -298,7 +298,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     }
 
     Write-Host -Object " "
-    
+
     if ($ProfileCache.AllCommands) {
         $randomCommand = $ProfileCache.AllCommands | Get-Random
 
@@ -348,7 +348,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
 
 function prompt {
     $formattedTime = (Get-Date).ToShortTimeString()
-    # $formattedTime = "[$(($formattedDate | Out-String).trim())]"
     $lastCmd = Get-History -Count 1
     if ($null -ne $lastCmd -and $null -ne $lastCmd.Duration -and $lastCmd.Duration.TotalSeconds -gt 1) {
         $lastCmdDuration = $lastCmd.Duration.Humanize()
@@ -362,10 +361,12 @@ function prompt {
         Write-Host " " -NoNewline
     }
     
+    Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor DarkBlue
+    Write-Host -Object " " -NoNewline
+
     Try {
         $repoStatus = Get-RepositoryStatus
-        Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor DarkBlue
-        Write-Host -Object " " -NoNewline
+        
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
         Write-VcsStatus
         Write-Host
@@ -381,8 +382,6 @@ function prompt {
     }
     Catch {
         $repoStatus = $null;
-        Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor DarkBlue
-        Write-Host -Object " " -NoNewline
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
         Write-Host
 
