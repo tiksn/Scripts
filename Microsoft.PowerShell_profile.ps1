@@ -307,13 +307,20 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     if ($ProfileCache.AllCommands) {
         $randomCommand = $ProfileCache.AllCommands | Get-Random
 
-        Write-Host -Object "⌨ " -NoNewline
-        Write-Host -Object $randomCommand.Name -NoNewline -ForegroundColor Black -BackgroundColor White
+        if ($randomCommand.CommandType.ToString() -eq 'Alias') {
+            if ($randomCommand.ModuleName) {
+                Import-Module -Name $randomCommand.ModuleName
+            }
+            $alias = Get-Alias -Name $randomCommand.Name
+            Write-Host -Object "$($alias.Name) -> $($alias.ResolvedCommandName)" -NoNewline -ForegroundColor Black -BackgroundColor White
+        }
+        else {
+            Write-Host -Object $randomCommand.Name -NoNewline -ForegroundColor Black -BackgroundColor White
+        }
         Write-Host -Object ' ' -NoNewline
         Write-Host -Object $randomCommand.CommandType.ToString() -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
         Write-Host -Object ' ' -NoNewline
         Write-Host -Object $randomCommand.Source -NoNewline
-        Write-Host -Object " ⌨"
         Write-Host -Object " "
     }
     
