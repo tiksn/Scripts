@@ -86,6 +86,12 @@ Write-Progress -Activity "Updating all Python PIP packages" -Id 1478576163
 
 $installList = PythonAlias -m pip freeze
 if ($?) {
+    if ($PSCmdlet.ShouldProcess("Python PIP", "Update")) {
+        Write-Progress -Activity "Updating Python PIP" -Id 1478576163 -CurrentOperation "Update Python PIP ..."
+        PythonAlias -m pip install --upgrade $package
+        PythonAlias -m pip install --upgrade pip
+    }
+
     $packages = $installList | ForEach-Object { $_.split('==')[0] }
     foreach ($package in $packages) {
         if ($PSCmdlet.ShouldProcess("Python PIP package $package", "Update Python PIP package")) {
