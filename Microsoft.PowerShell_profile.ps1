@@ -65,6 +65,25 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         }
     }
 
+    function ConvertToFahrenheit {
+        param (
+            [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+            [double]
+            $TemperatureInKelvin
+        )
+        $r = $TemperatureInKelvin / 5 * 9
+        return $r - 459.67
+    }
+
+    function ConvertToCelcius {
+        param (
+            [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+            [double]
+            $TemperatureInKelvin
+        )
+        return $TemperatureInKelvin - 273.15
+    }
+
     if ($features.NationalBankOfUkraineRates -and ($null -ne $ProfileCache.NationalBankOfUkraine.ExchangeRates) -and ($null -ne $ProfileCache.NationalBankOfUkraine.YesterdaysExchangeRates)) {
         $usduahToday = $ProfileCache.NationalBankOfUkraine.ExchangeRates | Where-Object { $_.cc -eq 'USD' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
         $euruahToday = $ProfileCache.NationalBankOfUkraine.ExchangeRates | Where-Object { $_.cc -eq 'EUR' } | Select-Object -ExpandProperty rate | ForEach-Object { [math]::Round($_, 2) }
@@ -145,6 +164,19 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     }
 
     Write-Host -Object " "
+
+    $temperatureInCelcius = $ProfileCache.OpenWeather.TemperatureInKelvin | ConvertToCelcius
+    $temperatureInCelcius = [math]::Round($temperatureInCelcius)
+    $temperatureInFahrenheit = $ProfileCache.OpenWeather.TemperatureInKelvin | ConvertToFahrenheit
+    $temperatureInFahrenheit = [math]::Round($temperatureInFahrenheit)
+    $temperatureFeelsInCelcius = $ProfileCache.OpenWeather.TemperatureFeelsInKelvin | ConvertToCelcius
+    $temperatureFeelsInCelcius = [math]::Round($temperatureFeelsInCelcius)
+    $temperatureFeelsInFahrenheit = $ProfileCache.OpenWeather.TemperatureFeelsInKelvin | ConvertToFahrenheit
+    $temperatureFeelsInFahrenheit = [math]::Round($temperatureFeelsInFahrenheit)
+    # $ProfileCache.OpenWeather.TemperatureFeelsInKelvin
+    Write-Host -Object "$temperatureInCelcius°C / $temperatureInFahrenheit°F" -NoNewline
+    Write-Host -Object " (Feels $temperatureFeelsInCelcius°C / $temperatureFeelsInFahrenheit°F)" -NoNewline
+    Write-Host -Object " $($ProfileCache.OpenWeather.CityName), $($ProfileCache.OpenWeather.CountryCode)"
 
     Write-Host -Object " "
 
