@@ -88,6 +88,8 @@ try {
         $ProfileCache.CentralBankOfArmeniaRates = $rates
     }
 
+    $ProfileCache.AllCommands = Get-Command * | Select-Object -Unique
+    
     $ProfileCache.Saved = Get-Date
     $ProfileCache | Export-Clixml -Path $PowerShellCachePath
 }
