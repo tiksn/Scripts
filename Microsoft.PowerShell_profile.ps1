@@ -2,7 +2,6 @@ Import-Module -Name ObjectiveGit
 Import-Module -Name posh-git
 Import-Module -Name Habitica
 Import-Module -Name PSCalendar
-Import-Module -Name PSReleaseTools
 Import-Module -Name PowerShellHumanizer
 
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
@@ -106,14 +105,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
                 Write-Output $allCommands
             }
 
-            $pwshRelease = Start-ThreadJob -ScriptBlock {
-                Get-PSReleaseCurrent | Write-Output 
-            }
-
-            $pwshPreviewRelease = Start-ThreadJob -ScriptBlock {
-                Get-PSReleaseCurrent -Preview | Write-Output 
-            }
-
             $saveCache = $true
 
             try {
@@ -146,22 +137,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
 
             try {
                 $ProfileCache.AllCommands = Receive-Job $allCommandsJob -Wait
-            }
-            catch {
-                $saveCache = $false
-                Write-Error $_
-            }
-
-            try {
-                $ProfileCache.Release = Receive-Job $pwshRelease -Wait
-            }
-            catch {
-                $saveCache = $false
-                Write-Error $_
-            }
-            
-            try {
-                $ProfileCache.ReleasePreview = Receive-Job $pwshPreviewRelease -Wait
             }
             catch {
                 $saveCache = $false
