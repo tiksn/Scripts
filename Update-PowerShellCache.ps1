@@ -57,6 +57,25 @@ try {
     $ProfileCache.Release = Get-PSReleaseCurrent
     $ProfileCache.ReleasePreview = Get-PSReleaseCurrent -Preview
 
+    $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
+    Connect-Habitica -Path $habiticaCredentialsFilePath
+
+    $dailys = Get-HabiticaTask -Type dailys
+    $todos = Get-HabiticaTask -Type todos
+    $habits = Get-HabiticaTask -Type habits
+    $dueDailies = $dailys | Where-Object { $_.IsDue -and (-not $_.completed) }
+    $dueHabits = $habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) }
+
+    $ProfileCache.Habitica = @{
+        DueDailies      = $dueDailies
+        DueDailiesCount = ($dueDailies | Measure-Object).Count
+        DueToDos        = $todos
+        DueToDoCount    = ($todos | Measure-Object).Count
+        DueHabits       = $dueHabits
+        DueHabitsCount  = ($dueHabits | Measure-Object).Count
+        HabiticaUser    = Get-HabiticaUser
+    }
+                
     if ($features.NationalBankOfUkraineRates) {
         $xml = New-Object xml
 
@@ -89,7 +108,7 @@ try {
     }
 
     $ProfileCache.AllCommands = Get-Command * | Select-Object -Unique
-    
+
     $ProfileCache.Saved = Get-Date
     $ProfileCache | Export-Clixml -Path $PowerShellCachePath
 }
