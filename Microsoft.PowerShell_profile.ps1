@@ -1,6 +1,5 @@
 Import-Module -Name ObjectiveGit
 Import-Module -Name posh-git
-Import-Module -Name Habitica
 Import-Module -Name PSCalendar
 Import-Module -Name PowerShellHumanizer
 
@@ -16,26 +15,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         $ProfileCache = Import-Clixml -Path $PowerShellCachePath
     }
     else {
-        $ProfileCache = [PSCustomObject]@{
-            Saved                     = $null
-            Release                   = $null
-            ReleasePreview            = $null
-            Habitica                  = [PSCustomObject]@{
-                DueDailies      = $null
-                DueDailiesCount = $null
-                DueToDos        = $null
-                DueToDoCount    = $null
-                DueHabits       = $null
-                DueHabitsCount  = $null
-                HabiticaUser    = $null
-            }
-            AllCommands               = $null
-            NationalBankOfUkraine     = [PSCustomObject]@{
-                ExchangeRates           = $null
-                YesterdaysExchangeRates = $null
-            }
-            CentralBankOfArmeniaRates = $null
-        }
+        $ProfileCache = $null
     }
 
     if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
@@ -163,6 +143,8 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
         Write-Host -Object $PSRelease.Version -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
         Write-Host -Object " version is available 🆕" -BackgroundColor White -ForegroundColor Black
     }
+
+    Write-Host -Object " "
 
     Write-Host -Object " "
 
