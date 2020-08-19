@@ -8,79 +8,39 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     Show-Calendar
     Write-Host -Object " "
 
-    [scriptblock]$initialize = {
-        $features = Get-Secret -Name 'PowerShellProfileFeatures'
+    $features = Get-Secret -Name 'PowerShellProfileFeatures'
 
-        $PowerShellCachePath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
+    $PowerShellCachePath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
 
-        if (Test-Path -Path $PowerShellCachePath) {
-            $ProfileCache = Import-Clixml -Path $PowerShellCachePath
-        }
-        else {
-            $ProfileCache = [PSCustomObject]@{
-                Saved                     = $null
-                Release                   = $null
-                ReleasePreview            = $null
-                Habitica                  = [PSCustomObject]@{
-                    DueDailies      = $null
-                    DueDailiesCount = $null
-                    DueToDos        = $null
-                    DueToDoCount    = $null
-                    DueHabits       = $null
-                    DueHabitsCount  = $null
-                    HabiticaUser    = $null
-                }
-                AllCommands               = $null
-                NationalBankOfUkraine     = [PSCustomObject]@{
-                    ExchangeRates           = $null
-                    YesterdaysExchangeRates = $null
-                }
-                CentralBankOfArmeniaRates = $null
+    if (Test-Path -Path $PowerShellCachePath) {
+        $ProfileCache = Import-Clixml -Path $PowerShellCachePath
+    }
+    else {
+        $ProfileCache = [PSCustomObject]@{
+            Saved                     = $null
+            Release                   = $null
+            ReleasePreview            = $null
+            Habitica                  = [PSCustomObject]@{
+                DueDailies      = $null
+                DueDailiesCount = $null
+                DueToDos        = $null
+                DueToDoCount    = $null
+                DueHabits       = $null
+                DueHabitsCount  = $null
+                HabiticaUser    = $null
             }
+            AllCommands               = $null
+            NationalBankOfUkraine     = [PSCustomObject]@{
+                ExchangeRates           = $null
+                YesterdaysExchangeRates = $null
+            }
+            CentralBankOfArmeniaRates = $null
         }
     }
 
-    Invoke-Command -ScriptBlock $initialize -NoNewScope
-
-    Start-ThreadJob -Name 'UpdatePowerShellCache' -InitializationScript $initialize -ScriptBlock {
-        if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
-            $habiticaJob = Start-ThreadJob -ScriptBlock {
-                $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
-                Connect-Habitica -Path $habiticaCredentialsFilePath
-
-                $dailys = Get-HabiticaTask -Type dailys
-                $todos = Get-HabiticaTask -Type todos
-                $habits = Get-HabiticaTask -Type habits
-                $dueDailies = $dailys | Where-Object { $_.IsDue -and (-not $_.completed) }
-                $dueHabits = $habits | Where-Object { ($_.counterUp -eq 0) -and ($_.counterDown -eq 0) }
-
-                [PSCustomObject]@{
-                    DueDailies      = $dueDailies
-                    DueDailiesCount = ($dueDailies | Measure-Object).Count
-                    DueToDos        = $todos
-                    DueToDoCount    = ($todos | Measure-Object).Count
-                    DueHabits       = $dueHabits
-                    DueHabitsCount  = ($dueHabits | Measure-Object).Count
-                    HabiticaUser    = Get-HabiticaUser
-                } | Write-Output
-            }
-
-            $saveCache = $true
-
-            try {
-                $ProfileCache.Habitica = Receive-Job $habiticaJob -Wait
-            }
-            catch {
-                $saveCache = $false
-                Write-Error $_
-            }
-
-            if ($saveCache) {
-                $ProfileCache.Saved = Get-Date
-                $ProfileCache | Export-Clixml -Path $PowerShellCachePath
-            }
-        }
-    } | Out-Null
+    if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
+        Write-Warning "Profile Cache is outdated. Last time updated on $($ProfileCache.Saved)"
+    }
 
     function GetSignedChange {
         param (
