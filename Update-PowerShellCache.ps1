@@ -53,6 +53,9 @@ try {
     $ProfileCache = @{}
 
     $ProfileCache.OpenWeather = GetOpenWeather
+
+    $ProfileCache.Release = Get-PSReleaseCurrent
+    $ProfileCache.ReleasePreview = Get-PSReleaseCurrent -Preview
     
     $ProfileCache.Saved = Get-Date
     $ProfileCache | Format-Custom
