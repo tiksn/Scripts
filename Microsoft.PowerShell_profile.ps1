@@ -44,41 +44,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
 
     Start-ThreadJob -Name 'UpdatePowerShellCache' -InitializationScript $initialize -ScriptBlock {
         if (!$ProfileCache -or !$ProfileCache.Saved -or ((Get-Date) - $ProfileCache.Saved) -gt (New-TimeSpan -Hours 1)) {
-            if ($features.NationalBankOfUkraineRates) {
-                $nationalBankOfUkraineJob = Start-ThreadJob -ScriptBlock {
-                    $xml = New-Object xml
-
-                    $xml.Load('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange')
-                    $exchangeRates = $xml.exchange | Select-Object -ExpandProperty currency
-
-                    $yesterdaysDatePattern = (Get-Date).AddDays(-1).ToString("yyyyMMdd")
-
-                    $xml.Load("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?date=$yesterdaysDatePattern")
-                    $yesterdaysExchangeRates = $xml.exchange | Select-Object -ExpandProperty currency
-
-                    [PSCustomObject]@{
-                        ExchangeRates           = $exchangeRates
-                        YesterdaysExchangeRates = $yesterdaysExchangeRates
-                    } | Write-Output
-                }
-            }
-        
-            if ($features.CentralBankOfArmeniaRates) {
-                $centralBankOfArmeniaJob = Start-ThreadJob -ScriptBlock {
-                    $response = Invoke-RestMethod 'https://www.cba.am/_layouts/rssreader.aspx?rss=280F57B8-763C-4EE4-90E0-8136C13E47DA' -Method 'GET' -Headers $headers -Body $body
-                    $response = $response | Select-Object -ExpandProperty title
-                    $rates = $response | ForEach-Object {
-                        $parts = $_ -split '-' | ForEach-Object { $_.Trim() }
-                        [PSCustomObject]@{
-                            Code = $parts[0]
-                            Rate = ($parts[2] -as [decimal]) / ($parts[1] -as [decimal])
-                        }
-                    }
-
-                    Write-Output $rates
-                }
-            }
-
             $habiticaJob = Start-ThreadJob -ScriptBlock {
                 $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
                 Connect-Habitica -Path $habiticaCredentialsFilePath
@@ -106,26 +71,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
             }
 
             $saveCache = $true
-
-            try {
-                if ($features.NationalBankOfUkraineRates) {
-                    $ProfileCache.NationalBankOfUkraine = Receive-Job $nationalBankOfUkraineJob -Wait
-                }
-            }
-            catch {
-                $saveCache = $false
-                Write-Error $_
-            }
-
-            try {
-                if ($features.CentralBankOfArmeniaRates) {
-                    $ProfileCache.CentralBankOfArmeniaRates = Receive-Job $centralBankOfArmeniaJob -Wait
-                }
-            }
-            catch {
-                $saveCache = $false
-                Write-Error $_
-            }
 
             try {
                 $ProfileCache.Habitica = Receive-Job $habiticaJob -Wait
