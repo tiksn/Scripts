@@ -65,23 +65,10 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
                 } | Write-Output
             }
 
-            $allCommandsJob = Start-ThreadJob -ScriptBlock {
-                $allCommands = Get-Command * | Select-Object -Unique
-                Write-Output $allCommands
-            }
-
             $saveCache = $true
 
             try {
                 $ProfileCache.Habitica = Receive-Job $habiticaJob -Wait
-            }
-            catch {
-                $saveCache = $false
-                Write-Error $_
-            }
-
-            try {
-                $ProfileCache.AllCommands = Receive-Job $allCommandsJob -Wait
             }
             catch {
                 $saveCache = $false
