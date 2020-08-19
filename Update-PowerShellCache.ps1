@@ -1,3 +1,4 @@
+Import-Module -Name Habitica
 Import-Module -Name PSReleaseTools
 
 $features = Get-Secret -Name 'PowerShellProfileFeatures'
