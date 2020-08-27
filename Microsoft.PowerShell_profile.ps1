@@ -2,6 +2,9 @@ Import-Module -Name ObjectiveGit
 Import-Module -Name posh-git
 Import-Module -Name PSCalendar
 Import-Module -Name PowerShellHumanizer
+Import-Module -Name Recycle
+
+Set-Alias -Name trash -Value Remove-ItemSafely
 
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     Show-Calendar
