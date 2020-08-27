@@ -1,4 +1,5 @@
 #Requires -RunAsAdministrator
+#Requires -Module PSWindowsUpdate
 
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
 Param ()
