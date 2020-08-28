@@ -1,5 +1,4 @@
 #Requires -RunAsAdministrator
-#Requires -Module PSWindowsUpdate
 
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
 Param ()
@@ -13,6 +12,8 @@ Write-Progress -Activity "Updating PowerShell Help files" -Id 1478576163
 Update-Help
 
 if ($IsWindows) {
+    Import-Module -Name PSWindowsUpdate
+
     Set-Alias -Name 'PythonAlias' -Value 'py'
 
     Write-Progress -Activity "Updating Defender signatures" -Id 1478576163
