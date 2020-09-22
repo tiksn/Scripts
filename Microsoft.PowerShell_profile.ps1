@@ -210,12 +210,12 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
     # PowerShell parameter completion shim for the WinGet
     Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
-            [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
-            $Local:word = $wordToComplete.Replace('"', '""')
-            $Local:ast = $commandAst.ToString().Replace('"', '""')
-            winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition | ForEach-Object {
-                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-            }
+        [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
+        $Local:word = $wordToComplete.Replace('"', '""')
+        $Local:ast = $commandAst.ToString().Replace('"', '""')
+        winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+        }
     }
 
     # PowerShell parameter completion shim for the GitHub CLI
@@ -286,6 +286,15 @@ function prompt {
     Write-Host -Object "$('>' * ($nestedPromptLevel + 1))" -NoNewline
 
     return " "
+}
+
+function quit {
+    $jobs = @(Get-Job | Where-Object { ($_.State -ne 'Completed') -and ($_.State -ne 'Disconnected') -and ($_.State -ne 'Failed') -and ($_.State -ne 'Stopped') }).Count
+    if ($jobs -gt 0) {
+        throw 'Now all jobs are finished'
+    }
+
+    exit
 }
 
 $PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath "PowerShellTranscripts"
