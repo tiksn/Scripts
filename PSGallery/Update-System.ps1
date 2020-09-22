@@ -1,3 +1,42 @@
+
+<#PSScriptInfo
+
+.VERSION 1.0
+
+.GUID 3aedfc83-f65b-4724-b810-9d849563645d
+
+.AUTHOR Tigran TIKSN Torosyan
+
+.COMPANYNAME 
+
+.COPYRIGHT TIKSN Lab
+
+.TAGS 
+
+.LICENSEURI 
+
+.PROJECTURI 
+
+.ICONURI 
+
+.EXTERNALMODULEDEPENDENCIES 
+
+.REQUIREDSCRIPTS 
+
+.EXTERNALSCRIPTDEPENDENCIES 
+
+.RELEASENOTES
+
+
+#>
+
+<# 
+
+.DESCRIPTION 
+ Update whole System
+
+#> 
+
 #Requires -RunAsAdministrator
 
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
