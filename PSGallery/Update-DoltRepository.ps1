@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.0.0
+.VERSION 1.0.1
 
 .GUID 0e6806b4-048d-4d8b-a863-2213301ab18e
 
@@ -50,8 +50,6 @@ Param(
     $Recurse
 )
 
-# Update-DoltRepository
-
 function IsDoltRepository {
     param (
         [Parameter(Mandatory = $true, HelpMessage = "Path to one locations.")]
@@ -92,9 +90,11 @@ function UpdateDoltRepository {
         Set-Location $Path
         Write-Verbose -Message "Changed working directory to $Path"
 
+        Write-Progress -Id 2087581109 -Activity "Fetching $Path"
         dolt fetch
         if ($?) {
             if ($ScriptCmdlet.ShouldProcess($Path, "Pull Dolt remote changes")) {
+                Write-Progress -Id 2087581109 -Activity "Pulling $Path"
                 dolt pull
             }
         }
@@ -149,3 +149,5 @@ else {
         Write-Error -Message "Path $Path is not a directory." -Category InvalidArgument
     }
 }
+
+Write-Progress -Id 2087581109 -Activity "Finished" -Completed
