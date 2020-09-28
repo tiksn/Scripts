@@ -6,7 +6,7 @@ Import-Module -Name Recycle
 
 Set-Alias -Name trash -Value Remove-ItemSafely
 
-if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN) {
+if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal')) {
     Show-Calendar
     Write-Host -Object " "
 
