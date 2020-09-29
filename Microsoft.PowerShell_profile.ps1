@@ -1,7 +1,8 @@
 Import-Module -Name ObjectiveGit
 Import-Module -Name posh-git
-Import-Module -Name PSCalendar
+Import-Module -Name posh-sshell
 Import-Module -Name PowerShellHumanizer
+Import-Module -Name PSCalendar
 Import-Module -Name Recycle
 
 Set-Alias -Name trash -Value Remove-ItemSafely
