@@ -233,6 +233,20 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
     $denoCompletion = [scriptblock]::Create($denoCompletion)
     Invoke-Command -ScriptBlock $denoCompletion
 
+    # PowerShell parameter completion shim for the Rustup
+    rustup completions powershell rustup | Set-Variable -Name rustupCompletion
+
+    $rustupCompletion = $rustupCompletion | ForEach-Object { Write-Output $_ } | Join-String -Separator ([System.Environment]::NewLine)
+    $rustupCompletion = [scriptblock]::Create($rustupCompletion)
+    Invoke-Command -ScriptBlock $rustupCompletion
+
+    # PowerShell parameter completion shim for the Cargo
+    rustup completions powershell cargo | Set-Variable -Name rustupCompletion
+
+    $rustupCompletion = $rustupCompletion | ForEach-Object { Write-Output $_ } | Join-String -Separator ([System.Environment]::NewLine)
+    $rustupCompletion = [scriptblock]::Create($rustupCompletion)
+    Invoke-Command -ScriptBlock $rustupCompletion
+
     # PowerShell parameter completion shim for the dotnet CLI
     Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
         param($commandName, $wordToComplete, $cursorPosition)
