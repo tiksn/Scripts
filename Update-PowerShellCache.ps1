@@ -75,7 +75,7 @@ try {
         DueHabits       = $dueHabits
         DueHabitsCount  = ($dueHabits | Measure-Object).Count
         HabiticaUser    = Get-HabiticaUser
-        HabiticaPart    = Get-HabiticaPart
+        HabiticaPart    = Get-HabiticaParty
     }
                 
     if ($features.NationalBankOfUkraineRates) {
