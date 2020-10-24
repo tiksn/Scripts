@@ -51,7 +51,7 @@ function GetOpenWeather {
 }
 
 try {
-    $ProfileCache = @{}
+    $ProfileCache = @{ }
 
     $ProfileCache.OpenWeather = GetOpenWeather
 
@@ -75,6 +75,7 @@ try {
         DueHabits       = $dueHabits
         DueHabitsCount  = ($dueHabits | Measure-Object).Count
         HabiticaUser    = Get-HabiticaUser
+        HabiticaPart    = Get-HabiticaPart
     }
                 
     if ($features.NationalBankOfUkraineRates) {
