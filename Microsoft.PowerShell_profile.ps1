@@ -279,7 +279,7 @@ function prompt {
         Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor Black
         Write-Host -Object " " -NoNewline
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
-        Write-VcsStatus
+        Write-VcsStatus | Write-Host -NoNewline
         Write-Host
 
         $gitRootPath = (Split-Path (Get-GitDirectory) -Parent)
