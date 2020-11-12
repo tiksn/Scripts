@@ -325,7 +325,9 @@ $TranscriptDate = Get-Date -Format "yyyy-MM-dd--hh-mm-ss"
 $instanceId = $Host.InstanceId
 $TranscriptFilePath = Join-Path -Path $PowerShellTranscriptsPath -ChildPath "$TranscriptDate $instanceId.txt"
 
-Set-PSReadLineOption -PredictionSource History
+Import-Module Az.Tools.Predictor
+Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+Set-PSReadLineOption -PredictionViewStyle ListView
 
 Start-Transcript -Path $TranscriptFilePath -Append
 
