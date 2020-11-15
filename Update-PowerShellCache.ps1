@@ -1,5 +1,4 @@
 Import-Module -Name Habitica
-Import-Module -Name PSReleaseTools
 
 $features = Get-Secret -Name 'PowerShellProfileFeatures'
 $PowerShellCachePath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
@@ -54,9 +53,6 @@ try {
     $ProfileCache = @{ }
 
     $ProfileCache.OpenWeather = GetOpenWeather
-
-    $ProfileCache.Release = Get-PSReleaseCurrent
-    $ProfileCache.ReleasePreview = Get-PSReleaseCurrent -Preview
 
     $habiticaCredentialsFilePath = Join-Path -Path $HOME -ChildPath "HabiticaCredentials"
     Connect-Habitica -Path $habiticaCredentialsFilePath
