@@ -154,21 +154,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
     }
     Write-Host -Object " "
 
-    if ($null -eq $PSVersionTable.PSVersion.PreReleaseLabel) {
-        $PSRelease = $ProfileCache.Release
-    }
-    else {
-        $PSRelease = $ProfileCache.ReleasePreview
-    }
-
-    if (($PSRelease.Version -ne $PSRelease.LocalVersion) -and ($PSRelease.Version -ne "v$($PSVersionTable.PSVersion)")) {
-        Write-Host -Object "🆕 New " -NoNewline -BackgroundColor White -ForegroundColor Black
-        Write-Host -Object $PSRelease.Version -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-        Write-Host -Object " version is available 🆕" -BackgroundColor White -ForegroundColor Black
-    }
-
-    Write-Host -Object " "
-
     $temperatureInCelcius = $ProfileCache.OpenWeather.TemperatureInKelvin | ConvertToCelcius
     $temperatureInCelcius = [math]::Round($temperatureInCelcius)
     $temperatureInFahrenheit = $ProfileCache.OpenWeather.TemperatureInKelvin | ConvertToFahrenheit
