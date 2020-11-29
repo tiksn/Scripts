@@ -3,9 +3,15 @@ Import-Module -Name posh-git
 Import-Module -Name posh-sshell
 Import-Module -Name PowerShellHumanizer
 Import-Module -Name PSCalendar
-Import-Module -Name Recycle
 
-Set-Alias -Name trash -Value Remove-ItemSafely
+if ($IsWindows) {
+    Import-Module -Name Recycle
+
+    Set-Alias -Name trash -Value Remove-ItemSafely    
+}
+elseif ($IsLinux) {
+    Get-Command -Name trash | Out-Null
+}
 
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal')) {
     Show-Calendar
