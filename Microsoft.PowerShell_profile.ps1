@@ -247,7 +247,12 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
     }
 
     # PowerShell parameter completion shim for CLI for Microsoft 365
-    &(Join-Path -Path $env:APPDATA -ChildPath 'npm\node_modules\@pnp\cli-microsoft365\scripts\Register-CLIM365Completion.ps1')
+    if ($IsWindows) {
+        &(Join-Path -Path $env:APPDATA -ChildPath 'npm\node_modules\@pnp\cli-microsoft365\scripts\Register-CLIM365Completion.ps1')
+    }
+    elseif ($IsLinux) {
+        &'/usr/local/lib/node_modules/@pnp/cli-microsoft365/scripts/Register-CLIM365Completion.ps1'
+    }
 }
 
 function prompt {
