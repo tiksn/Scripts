@@ -327,4 +327,7 @@ Set-PSReadLineOption -PredictionViewStyle ListView
 
 Start-Transcript -Path $TranscriptFilePath -Append
 
-# Invoke-Expression (&starship init powershell)
+if ($env:WT_PROFILE_ID -eq '{2595cd9c-8f05-55ff-a1d4-93f3041ca67f}') {
+    # PowerShell Preview
+    Invoke-Expression (&starship init powershell)
+}
