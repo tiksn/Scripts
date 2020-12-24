@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.0
+.VERSION 1.0.1
 
 .GUID 3aedfc83-f65b-4724-b810-9d849563645d
 
@@ -103,9 +103,26 @@ if ($IsLinux) {
 Write-Progress -Activity "Updating all .NET Core Global Tools" -Id 1478576163
 
 foreach ($package in $(dotnet tool list --global | Select-Object -Skip 2)) {
-    $tool = $package.Split(" ", 2)[0]
-    if ($PSCmdlet.ShouldProcess("DotNet global tool $tool", "Update global tool")) {
-        dotnet tool update --global $tool
+    $parts = $package.Split(" ", 2)
+    $tool = $parts[0]
+    $parts = $parts[1].TrimStart().Split(" ", 2)
+    $installedVersion = $parts[0]
+
+    Write-Progress -Activity "Updating all .NET Core Global Tools" -Status "Checking updates for $tool" -Id 1478576163
+
+    foreach ($searchResult in $(dotnet tool search $tool | Select-Object -Skip 2)) {
+        $parts = $searchResult.Split(" ", 2)
+        $resultTool = $parts[0]
+        $parts = $parts[1].TrimStart().Split(" ", 2)
+        $resultVersion = $parts[0]
+
+        if ($tool -eq $resultTool) {
+            if ($installedVersion -ne $resultVersion) {
+                if ($PSCmdlet.ShouldProcess("DotNet global tool $tool", "Update global tool")) {
+                    dotnet tool update --global $tool
+                }
+            }
+        }
     }
 }
 
