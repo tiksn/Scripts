@@ -205,6 +205,15 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
         Import-Module Az.Tools.Predictor
         Set-PSReadLineOption -PredictionSource HistoryAndPlugin
         Set-PSReadLineOption -PredictionViewStyle ListView
+
+        Set-PSReadLineKeyHandler -Key Ctrl+Shift+l `
+            -BriefDescription ListCurrentDirectory `
+            -LongDescription "List the current directory" `
+            -ScriptBlock {
+            [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
+            [Microsoft.PowerShell.PSConsoleReadLine]::Insert("Get-ChildItem")
+            [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+        }
     }
 
     # PowerShell parameter completion shim for the WinGet
