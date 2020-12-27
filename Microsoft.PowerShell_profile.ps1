@@ -199,6 +199,14 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
         # Get-Command -Name $randomCommand.Name -Syntax
     }
     
+    if ($host.Name -eq 'ConsoleHost') {
+        Import-Module PSReadLine
+
+        Import-Module Az.Tools.Predictor
+        Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+        Set-PSReadLineOption -PredictionViewStyle ListView
+    }
+
     # PowerShell parameter completion shim for the WinGet
     Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
@@ -320,10 +328,6 @@ if (-not (Test-Path -Path $PowerShellTranscriptsPath)) {
 $TranscriptDate = Get-Date -Format "yyyy-MM-dd--hh-mm-ss"
 $instanceId = $Host.InstanceId
 $TranscriptFilePath = Join-Path -Path $PowerShellTranscriptsPath -ChildPath "$TranscriptDate $instanceId.txt"
-
-Import-Module Az.Tools.Predictor
-Set-PSReadLineOption -PredictionSource HistoryAndPlugin
-Set-PSReadLineOption -PredictionViewStyle ListView
 
 Start-Transcript -Path $TranscriptFilePath -Append
 
