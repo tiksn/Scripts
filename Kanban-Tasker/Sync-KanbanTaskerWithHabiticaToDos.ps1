@@ -3,6 +3,7 @@ param()
 
 Import-Module -Name Habitica
 Import-Module -Name SQLiteModule
+Import-Module -Name Appx -UseWIndowsPowershell
 
 $ktPackage = Get-AppPackage -Name 17325HunterJohnson.KanbanTasker
 $packagesPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Packages'
