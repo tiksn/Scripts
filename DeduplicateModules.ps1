@@ -10,6 +10,6 @@ for ($i = 0; $i -lt $multiversionModuleGroups.Count; $i++) {
     for ($j = 0; $j -lt $olderModules.Count; $j++) {
         $olderModule = $olderModules[$j]
         Write-Progress -Id 734181098 -ParentId 1756233909 -Activity "Uninstalling older version" -Status "$($olderModule.Version) (latest $($latestVersionModule.Version))" -PercentComplete (($j + 1) * 100 / $olderModules.Count)
-        $olderModule | Uninstall-Module
+        Uninstall-Module -Name $olderModule.Name -RequiredVersion $olderModule.Version
     }
 }
