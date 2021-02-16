@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.0.2
+.VERSION 1.0.3
 
 .GUID 3aedfc83-f65b-4724-b810-9d849563645d
 
@@ -60,6 +60,9 @@ if ($IsWindows) {
 
     Write-Progress -Activity "Updating Windows Package Manager all sources" -Id 1478576163
     winget source update
+
+    Write-Progress -Activity "Updating Windows Package Manager all sources" -Id 1478576163
+    winget upgrade --all
 
     Write-Progress -Activity "Updating Chocolatey packages" -Id 1478576163
     if ($PSCmdlet.ShouldProcess("Chocolatey packages", "Update all packages")) {
