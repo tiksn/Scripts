@@ -149,7 +149,6 @@ $installList = PythonAlias -m pip freeze
 if ($?) {
     if ($PSCmdlet.ShouldProcess("Python PIP", "Update")) {
         Write-Progress -Activity "Updating Python PIP" -Id 1478576163 -CurrentOperation "Update Python PIP ..."
-        PythonAlias -m pip install --upgrade $package
         PythonAlias -m pip install --upgrade pip
     }
 
