@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.0.3
+.VERSION 1.0.4
 
 .GUID 3aedfc83-f65b-4724-b810-9d849563645d
 
@@ -92,9 +92,9 @@ if ($IsLinux) {
 
     if ($IsFedora) {
         dnf check-update
-        dnf update
+        dnf update -y
 
-        flatpak update
+        flatpak update -y
     }
 
     if ($IsUbuntu -or $IsDebian) {
