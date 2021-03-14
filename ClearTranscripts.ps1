@@ -1,4 +1,9 @@
-Import-Module -Name Recycle
+if ($IsWindows) {
+    Import-Module -Name Recycle
+}
+elseif ($IsLinux) {
+    Set-Alias -Name 'Remove-ItemSafely' -Value 'trash' -Option Private -Scope Private
+}
 
 $PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath "PowerShellTranscripts"
 
