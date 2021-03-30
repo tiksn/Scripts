@@ -234,13 +234,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
     $ghCompletion = [scriptblock]::Create($ghCompletion)
     Invoke-Command -ScriptBlock $ghCompletion
 
-    # PowerShell parameter completion shim for the Deno
-    deno completions powershell | Set-Variable -Name denoCompletion
-
-    $denoCompletion = $denoCompletion | ForEach-Object { Write-Output $_ } | Join-String -Separator ([System.Environment]::NewLine)
-    $denoCompletion = [scriptblock]::Create($denoCompletion)
-    Invoke-Command -ScriptBlock $denoCompletion
-
     # PowerShell parameter completion shim for the Rustup
     rustup completions powershell rustup | Set-Variable -Name rustupCompletion
 
