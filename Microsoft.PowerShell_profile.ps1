@@ -15,11 +15,11 @@ elseif ($IsLinux) {
 
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal')) {
     Show-Calendar
-    Write-Host -Object " "
+    Write-Host -Object ' '
 
     $features = Get-Secret -Name 'PowerShellProfileFeatures'
 
-    $PowerShellCachePath = Join-Path -Path $HOME -ChildPath "PowerShellCache"
+    $PowerShellCachePath = Join-Path -Path $HOME -ChildPath 'PowerShellCache'
 
     if (Test-Path -Path $PowerShellCachePath) {
         $ProfileCache = Import-Clixml -Path $PowerShellCachePath
@@ -55,13 +55,13 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
         )
 
         if ($delta -gt 0) {
-            $sign = "🔼"
+            $sign = '🔼'
         }
         elseif ($delta -lt 0) {
-            $sign = "🔽"
+            $sign = '🔽'
         }
         else {
-            $sign = "≡"
+            $sign = '≡'
         }
 
         $percentage = ($delta * 100) / $total
@@ -130,35 +130,35 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
 
     if ($null -ne $ProfileCache.Habitica.HabiticaUser) {
         switch ($ProfileCache.Habitica.HabiticaUser.stats.hp) {
-            { $_ -lt 8 } { Write-Host -Object "🖤" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
-            { $_ -lt 15 } { Write-Host -Object "🤎" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
-            { $_ -lt 22 } { Write-Host -Object "🧡" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
-            { $_ -lt 29 } { Write-Host -Object "💜" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
-            { $_ -lt 36 } { Write-Host -Object "💛" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
-            { $_ -lt 43 } { Write-Host -Object "💚" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
-            Default { Write-Host -Object "💙" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta }
+            { $_ -lt 8 } { Write-Host -Object '🖤' -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
+            { $_ -lt 15 } { Write-Host -Object '🤎' -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
+            { $_ -lt 22 } { Write-Host -Object '🧡' -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
+            { $_ -lt 29 } { Write-Host -Object '💜' -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
+            { $_ -lt 36 } { Write-Host -Object '💛' -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
+            { $_ -lt 43 } { Write-Host -Object '💚' -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta ; break }
+            Default { Write-Host -Object '💙' -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta }
         }
-        Write-Host -Object " $($ProfileCache.Habitica.HabiticaUser.stats.hp.ToString("N0")) / 50" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-        Write-Host -Object " " -NoNewline
+        Write-Host -Object " $($ProfileCache.Habitica.HabiticaUser.stats.hp.ToString('N0')) / 50" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+        Write-Host -Object ' ' -NoNewline
         Write-Host -Object "🐱‍🏍 $($ProfileCache.Habitica.HabiticaUser.stats.lvl)" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-        Write-Host -Object " " -NoNewline
-        Write-Host -Object "🥇 $($ProfileCache.Habitica.HabiticaUser.stats.gp.ToString("N0"))" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-        Write-Host -Object " " -NoNewline
+        Write-Host -Object ' ' -NoNewline
+        Write-Host -Object "🥇 $($ProfileCache.Habitica.HabiticaUser.stats.gp.ToString('N0'))" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
+        Write-Host -Object ' ' -NoNewline
     }
     if ($null -ne $ProfileCache.Habitica.DueHabitsCount) {
-        Write-Host -Object " " -NoNewline
+        Write-Host -Object ' ' -NoNewline
         Write-Host -Object "🎯 $($ProfileCache.Habitica.DueHabitsCount)" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-        Write-Host -Object " " -NoNewline
+        Write-Host -Object ' ' -NoNewline
     }
     if ($null -ne $ProfileCache.Habitica.DueDailiesCount) {
         Write-Host -Object "🔥 $($ProfileCache.Habitica.DueDailiesCount)" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-        Write-Host -Object " " -NoNewline
+        Write-Host -Object ' ' -NoNewline
     }
     if ($null -ne $ProfileCache.Habitica.DueToDoCount) {
         Write-Host -Object "🌌 $($ProfileCache.Habitica.DueToDoCount)" -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
-        Write-Host -Object " " -NoNewline
+        Write-Host -Object ' ' -NoNewline
     }
-    Write-Host -Object " "
+    Write-Host -Object ' '
 
     $temperatureInCelcius = $ProfileCache.OpenWeather.TemperatureInKelvin | ConvertToCelcius
     $temperatureInCelcius = [math]::Round($temperatureInCelcius)
@@ -173,7 +173,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
     Write-Host -Object " (Feels $temperatureFeelsInCelcius°C / $temperatureFeelsInFahrenheit°F)" -NoNewline
     Write-Host -Object " $($ProfileCache.OpenWeather.CityName), $($ProfileCache.OpenWeather.CountryCode)"
 
-    Write-Host -Object " "
+    Write-Host -Object ' '
 
     if ($ProfileCache.AllCommands) {
         $randomCommand = $ProfileCache.AllCommands | Get-Random
@@ -192,7 +192,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
         Write-Host -Object $randomCommand.CommandType.ToString() -NoNewline -BackgroundColor Yellow -ForegroundColor Magenta
         Write-Host -Object ' ' -NoNewline
         Write-Host -Object $randomCommand.Source -NoNewline
-        Write-Host -Object " "
+        Write-Host -Object ' '
     }
     
     if ($randomCommand.CommandType -ne [System.Management.Automation.CommandTypes]::Application) {
@@ -208,10 +208,10 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
 
         Set-PSReadLineKeyHandler -Key Ctrl+Shift+l `
             -BriefDescription ListCurrentDirectory `
-            -LongDescription "List the current directory" `
+            -LongDescription 'List the current directory' `
             -ScriptBlock {
             [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
-            [Microsoft.PowerShell.PSConsoleReadLine]::Insert("Get-ChildItem")
+            [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Get-ChildItem')
             [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
         }
     }
@@ -234,20 +234,22 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
     $ghCompletion = [scriptblock]::Create($ghCompletion)
     Invoke-Command -ScriptBlock $ghCompletion
 
-    # PowerShell parameter completion shim for the Rustup
-    rustup completions powershell rustup | Set-Variable -Name rustupCompletion
+    if (Get-Command rustup -ErrorAction Ignore) {
+        # PowerShell parameter completion shim for the Rustup
+        rustup completions powershell rustup | Set-Variable -Name rustupCompletion
 
-    $rustupCompletion = $rustupCompletion | ForEach-Object { Write-Output $_ } | Join-String -Separator ([System.Environment]::NewLine)
-    $rustupCompletion = [scriptblock]::Create($rustupCompletion)
-    Invoke-Command -ScriptBlock $rustupCompletion
+        $rustupCompletion = $rustupCompletion | ForEach-Object { Write-Output $_ } | Join-String -Separator ([System.Environment]::NewLine)
+        $rustupCompletion = [scriptblock]::Create($rustupCompletion)
+        Invoke-Command -ScriptBlock $rustupCompletion
 
-    # PowerShell parameter completion shim for the Cargo
-    rustup completions powershell cargo | Set-Variable -Name rustupCompletion
+        # PowerShell parameter completion shim for the Cargo
+        rustup completions powershell cargo | Set-Variable -Name rustupCompletion
 
-    $rustupCompletion = $rustupCompletion | ForEach-Object { Write-Output $_ } | Join-String -Separator ([System.Environment]::NewLine)
-    $rustupCompletion = [scriptblock]::Create($rustupCompletion)
-    Invoke-Command -ScriptBlock $rustupCompletion
-
+        $rustupCompletion = $rustupCompletion | ForEach-Object { Write-Output $_ } | Join-String -Separator ([System.Environment]::NewLine)
+        $rustupCompletion = [scriptblock]::Create($rustupCompletion)
+        Invoke-Command -ScriptBlock $rustupCompletion
+    }
+    
     # PowerShell parameter completion shim for the dotnet CLI
     Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
         param($commandName, $wordToComplete, $cursorPosition)
@@ -263,19 +265,19 @@ function prompt {
     if ($null -ne $lastCmd -and $null -ne $lastCmd.Duration -and $lastCmd.Duration.TotalSeconds -gt 1) {
         $lastCmdDuration = $lastCmd.Duration.Humanize()
         Write-Host -Object "$lastCmdDuration" -NoNewline -ForegroundColor Magenta
-        Write-Host " " -NoNewline
+        Write-Host ' ' -NoNewline
     }
 
     $jobs = @(Get-Job | Where-Object { $_.State -eq 'Running' }).Count
     if ($jobs -gt 0) {
-        1..$jobs | ForEach-Object { Write-Host "🔨" -NoNewline }
-        Write-Host " " -NoNewline
+        1..$jobs | ForEach-Object { Write-Host '🔨' -NoNewline }
+        Write-Host ' ' -NoNewline
     }
     
     Try {
         $repoStatus = Get-RepositoryStatus
         Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor Black
-        Write-Host -Object " " -NoNewline
+        Write-Host -Object ' ' -NoNewline
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
         Write-VcsStatus | Write-Host -NoNewline
         Write-Host
@@ -286,13 +288,13 @@ function prompt {
         $subPath = $gitFolderName + $subPath
         $pathParts = $subPath.Split([IO.Path]::DirectorySeparatorChar)
         [array]::Reverse($pathParts)
-        $host.ui.RawUI.WindowTitle = $pathParts -join " < "
+        $host.ui.RawUI.WindowTitle = $pathParts -join ' < '
         # return "GIT $($executionContext.SessionState.Path.CurrentLocation) | $($repoStatus.CurrentBranch) $($repoStatus.Files.Count)`n$('>' * ($nestedPromptLevel + 1)) ";
     }
     Catch {
         $repoStatus = $null;
         Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor Black
-        Write-Host -Object " " -NoNewline
+        Write-Host -Object ' ' -NoNewline
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
         Write-Host
 
@@ -301,7 +303,7 @@ function prompt {
 
     Write-Host -Object "$('>' * ($nestedPromptLevel + 1))" -NoNewline
 
-    return " "
+    return ' '
 }
 
 function quit {
@@ -313,13 +315,13 @@ function quit {
     exit
 }
 
-$PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath "PowerShellTranscripts"
+$PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath 'PowerShellTranscripts'
 
 if (-not (Test-Path -Path $PowerShellTranscriptsPath)) {
     New-Item -Path $PowerShellTranscriptsPath -ItemType Directory
 }
 
-$TranscriptDate = Get-Date -Format "yyyy-MM-dd--hh-mm-ss"
+$TranscriptDate = Get-Date -Format 'yyyy-MM-dd--hh-mm-ss'
 $instanceId = $Host.InstanceId
 $TranscriptFilePath = Join-Path -Path $PowerShellTranscriptsPath -ChildPath "$TranscriptDate $instanceId.txt"
 
