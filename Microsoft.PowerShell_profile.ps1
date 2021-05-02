@@ -1,4 +1,3 @@
-Import-Module -Name ObjectiveGit
 Import-Module -Name posh-git
 Import-Module -Name posh-sshell
 Import-Module -Name PowerShellHumanizer
@@ -275,7 +274,10 @@ function prompt {
     }
     
     Try {
-        $repoStatus = Get-RepositoryStatus
+        $repoStatus = Get-GitStatus
+        if ($null -eq $repoStatus) {
+            throw 'Not a git repository folder.'
+        }
         Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor Black
         Write-Host -Object ' ' -NoNewline
         Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
