@@ -129,26 +129,28 @@ function UpdateGitRepositories {
     }
 }
 
-$parentDirectory = Get-Item $Path
-if ($null -eq $parentDirectory) {
-    Write-Error -Message "Path $Path is not accessible." -Category ObjectNotFound
-}
-else {
-    $ScriptCmdlet = $PSCmdlet
-    if ($parentDirectory.PSIsContainer) {
-        if (IsGitRepository -Path $parentDirectory) {
-            UpdateGitRepository -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet
-        }
-        elseif ($Recurse) {
-            UpdateGitRepositories -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet
-        }
-        else {
-            Write-Error -Message "$Path is not a git repository directory." -Category InvalidArgument
-        }
+$resolvedPath = Resolve-Path -Path $Path
+if ($?) {
+    $parentDirectory = Get-Item -Path $resolvedPath
+    if ($null -eq $parentDirectory) {
+        Write-Error -Message "Path $resolvedPath is not accessible." -Category ObjectNotFound
     }
     else {
-        Write-Error -Message "Path $Path is not a directory." -Category InvalidArgument
+        $ScriptCmdlet = $PSCmdlet
+        if ($parentDirectory.PSIsContainer) {
+            if (IsGitRepository -Path $parentDirectory) {
+                UpdateGitRepository -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet
+            }
+            elseif ($Recurse) {
+                UpdateGitRepositories -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet
+            }
+            else {
+                Write-Error -Message "$resolvedPath is not a git repository directory." -Category InvalidArgument
+            }
+        }
+        else {
+            Write-Error -Message "Path $resolvedPath is not a directory." -Category InvalidArgument
+        }
     }
 }
-
 Write-Progress -Id 2087581109 -Activity 'Finished' -Completed
