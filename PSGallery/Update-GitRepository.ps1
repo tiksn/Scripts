@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.0.0
+.VERSION 1.0.1
 
 .GUID ae0a8e93-0a77-4fb7-9837-64776641fc34
 
@@ -94,7 +94,7 @@ function UpdateGitRepository {
         Write-Progress -Id 2087581109 -Activity "Fetching $Path"
         git fetch --all --prune --tags --recurse-submodules=yes
         if ($?) {
-            if ($ScriptCmdlet.ShouldProcess($Path, 'Pull Dolt remote changes')) {
+            if ($ScriptCmdlet.ShouldProcess($Path, 'Pull Git remote changes')) {
                 Write-Progress -Id 2087581109 -Activity "Pulling $Path"
                 git pull --recurse-submodules=yes --ff-only --rebase=true
             }
