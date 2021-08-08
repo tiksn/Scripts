@@ -12,7 +12,7 @@ elseif ($IsLinux) {
     Get-Command -Name trash | Out-Null
 }
 
-if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal')) {
+if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal') -or ($env:TERM_PROGRAM -eq 'Apple_Terminal')) {
     Show-Calendar
     
     if ($host.Name -eq 'ConsoleHost') {
