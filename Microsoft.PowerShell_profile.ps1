@@ -125,7 +125,11 @@ function prompt {
     return ' '
 }
 
-function quit {
+function quit() {
+    [CmdletBinding()]
+    param (
+    )
+
     $jobs = @(Get-Job | Where-Object { ($_.State -ne 'Completed') -and ($_.State -ne 'Disconnected') -and ($_.State -ne 'Failed') -and ($_.State -ne 'Stopped') }).Count
     if ($jobs -gt 0) {
         throw 'Not all jobs are finished'
