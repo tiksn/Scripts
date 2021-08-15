@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.0.6
+.VERSION 1.0.7
 
 .GUID 3aedfc83-f65b-4724-b810-9d849563645d
 
@@ -135,6 +135,11 @@ Write-Progress -Activity 'Applying .NET template updates' -Id 1478576163
 dotnet new --update-apply
 
 Write-Progress -Activity 'Updating all Rust Cargo Crates' -Id 1478576163
+
+Write-Progress -Activity 'Updating NPM Global Packages' -Id 1478576163
+if ($PSCmdlet.ShouldProcess('NPM Global Packages', 'Update all packages')) {
+    npm update --global
+}
 
 $installList = cargo install --list
 if ($?) {
