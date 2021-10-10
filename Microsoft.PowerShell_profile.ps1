@@ -8,6 +8,9 @@ if ($IsWindows) {
 
     Set-Alias -Name trash -Value Remove-ItemSafely    
 }
+elseif ($IsMacOS) {
+    $env:PATH = "$env:PATH`:~/.local/share/powershell/Scripts"
+}
 elseif ($IsLinux) {
     Get-Command -Name trash | Out-Null
 }
