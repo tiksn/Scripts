@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.0.8
+.VERSION 1.0.9
 
 .GUID 3aedfc83-f65b-4724-b810-9d849563645d
 
@@ -77,6 +77,11 @@ if ($IsWindows) {
     
     Write-Progress -Activity 'Updating Windows' -Id 1478576163
     Get-WUServiceManager | ForEach-Object { Install-WindowsUpdate -ServiceID $_.ServiceID -AcceptAll }
+}
+
+if ($IsMacOS) {
+    Write-Progress -Activity 'Updating Homebrew packages' -Id 1478576163
+    brew upgrade --cask
 }
 
 if ($IsLinux) {
