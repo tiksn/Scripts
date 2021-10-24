@@ -13,6 +13,8 @@ elseif ($IsMacOS) {
 }
 elseif ($IsLinux) {
     Get-Command -Name trash | Out-Null
+
+    $env:PATH = "$env:PATH`:~/.local/share/powershell/Scripts"
 }
 
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal') -or ($env:TERM_PROGRAM -eq 'Apple_Terminal')) {
