@@ -2,6 +2,7 @@
     "recommendations": [
         "ms-vscode.powershell",
         "ms-dotnettools.dotnet-interactive-vscode",
-        "ms-dotnettools.vscode-dotnet-pack"
+        "ms-dotnettools.vscode-dotnet-pack",
+        "ms-vsliveshare.vsliveshare-pack"
     ]
 }
