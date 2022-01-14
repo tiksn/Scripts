@@ -6,9 +6,6 @@ $commands = $commands | Select-Object -Unique Name
 #!pwsh
 
 $command = $commands | Get-Random
-
-#!pwsh
-
 Get-Command -Name $command.Name
 
 #!pwsh
