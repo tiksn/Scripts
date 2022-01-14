@@ -1,0 +1,20 @@
+#!pwsh
+
+$commands = Get-Command -All -CommandType All
+$commands = $commands | Select-Object -Unique Name
+
+#!pwsh
+
+$command = $commands | Get-Random
+
+#!pwsh
+
+Get-Command -Name $command.Name
+
+#!pwsh
+
+Get-Command -Name $command.Name -Syntax
+
+#!pwsh
+
+Get-Help -Name $command.Name
