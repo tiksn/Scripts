@@ -1,6 +1,6 @@
 <Query Kind="Expression">
   <Output>DataGrids</Output>
-  <NuGetReference Prerelease="true">TIKSN-Framework</NuGetReference>
+  <NuGetReference>TIKSN-Framework</NuGetReference>
   <NuGetReference>UnicodeInformation</NuGetReference>
   <Namespace>System.Globalization</Namespace>
   <Namespace>System.Unicode</Namespace>
