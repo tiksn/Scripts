@@ -110,6 +110,8 @@ if ($IsLinux) {
 
 Write-Progress -Activity 'Updating all .NET Core Global Tools' -Id 1478576163
 
+dotnet tool list --global | Out-Null
+
 foreach ($package in $(dotnet tool list --global | Select-Object -Skip 2)) {
     $parts = $package.Split(' ', 2)
     $tool = $parts[0]
