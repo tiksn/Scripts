@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.0.10
+.VERSION 1.1.0
 
 .GUID 3aedfc83-f65b-4724-b810-9d849563645d
 
@@ -105,6 +105,11 @@ if ($IsLinux) {
     if ($IsUbuntu -or $IsDebian) {
         apt update
         apt upgrade
+    }
+
+    if (Get-Command -Name brew -ErrorAction SilentlyContinue) {
+        Write-Progress -Activity 'Updating Homebrew packages' -Id 1478576163
+        brew upgrade --cask
     }
 }
 
