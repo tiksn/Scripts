@@ -1,0 +1,14 @@
+#!pwsh
+
+$scripts = Find-Script
+$scripts = $scripts | Select-Object -Unique Name
+
+#!pwsh
+
+$script = $scripts | Get-Random
+$scriptAndDependencies = Find-Script -Name $script.Name -IncludeDependencies
+$scriptAndDependencies
+
+#!pwsh
+
+$scriptAndDependencies | Select-Object -ExpandProperty Description
