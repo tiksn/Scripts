@@ -1,0 +1,14 @@
+#!pwsh
+
+$modules = Find-Module
+$modules = $modules | Select-Object -Unique Name
+
+#!pwsh
+
+$module = $modules | Get-Random
+$moduleAndDependencies = Find-Module -Name $module.Name -IncludeDependencies
+$moduleAndDependencies
+
+#!pwsh
+
+$moduleAndDependencies | Select-Object -ExpandProperty Description
