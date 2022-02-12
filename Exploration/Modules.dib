@@ -12,3 +12,7 @@ $moduleAndDependencies
 #!pwsh
 
 $moduleAndDependencies | Select-Object -ExpandProperty Description
+
+#!pwsh
+
+Find-Command -ModuleName $module.Name
