@@ -1,5 +1,4 @@
 Import-Module -Name posh-git
-Import-Module -Name posh-sshell
 Import-Module -Name PowerShellHumanizer
 Import-Module -Name PSCalendar
 
