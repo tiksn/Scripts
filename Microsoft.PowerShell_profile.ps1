@@ -22,7 +22,7 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
     if ($host.Name -eq 'ConsoleHost') {
         Import-Module PSReadLine
 
-        Import-Module Az.Tools.Predictor
+        # Import-Module Az.Tools.Predictor
         Set-PSReadLineOption -PredictionSource HistoryAndPlugin
         Set-PSReadLineOption -PredictionViewStyle ListView
 
