@@ -16,25 +16,25 @@ elseif ($IsLinux) {
     $env:PATH = "$env:PATH`:~/.local/share/powershell/Scripts"
 }
 
+if ($host.Name -eq 'ConsoleHost') {
+    Import-Module -Name PSReadLine
+
+    # Import-Module Az.Tools.Predictor
+    Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+    Set-PSReadLineOption -PredictionViewStyle ListView
+
+    Set-PSReadLineKeyHandler -Key Ctrl+Shift+l `
+        -BriefDescription ListCurrentDirectory `
+        -LongDescription 'List the current directory' `
+        -ScriptBlock {
+        [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
+        [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Get-ChildItem')
+        [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+    }
+}
+
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal') -or ($env:TERM_PROGRAM -eq 'Apple_Terminal')) {
     Show-Calendar
-    
-    if ($host.Name -eq 'ConsoleHost') {
-        Import-Module PSReadLine
-
-        # Import-Module Az.Tools.Predictor
-        Set-PSReadLineOption -PredictionSource HistoryAndPlugin
-        Set-PSReadLineOption -PredictionViewStyle ListView
-
-        Set-PSReadLineKeyHandler -Key Ctrl+Shift+l `
-            -BriefDescription ListCurrentDirectory `
-            -LongDescription 'List the current directory' `
-            -ScriptBlock {
-            [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
-            [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Get-ChildItem')
-            [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
-        }
-    }
 
     # PowerShell parameter completion shim for the WinGet
     Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
