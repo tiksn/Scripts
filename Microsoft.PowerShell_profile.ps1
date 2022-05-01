@@ -159,8 +159,6 @@ if ($env:WT_PROFILE_ID -eq '{2595cd9c-8f05-55ff-a1d4-93f3041ca67f}') {
     Invoke-Expression (&starship init powershell)
 }
 else {
-    # oh-my-posh --init --shell pwsh --config $env:POSH_THEMES_PATH/emodipt.omp.json | Invoke-Expression
-    # oh-my-posh --init --shell pwsh --config $env:POSH_THEMES_PATH/powerlevel10k_lean.omp.json | Invoke-Expression
-    # oh-my-posh --init --shell pwsh --config $env:POSH_THEMES_PATH/stelbent.minimal.omp.json | Invoke-Expression
-    oh-my-posh --init --shell pwsh --config $env:POSH_THEMES_PATH/ys.omp.json | Invoke-Expression
+    oh-my-posh --init --shell pwsh --config $env:POSH_THEMES_PATH/free-ukraine.omp.json | Invoke-Expression
+    # oh-my-posh --init --shell pwsh --config $env:POSH_THEMES_PATH/unicorn.omp.json | Invoke-Expression
 }
