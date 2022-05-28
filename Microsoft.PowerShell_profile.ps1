@@ -2,6 +2,22 @@ Import-Module -Name posh-git
 Import-Module -Name PowerShellHumanizer
 Import-Module -Name PSCalendar
 
+function Show-Time {
+    [CmdletBinding()]
+    param (
+        
+    )
+    
+    $timeNow = Get-Date
+    $timeNowInKyiv = [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($timeNow, 'FLE Standard Time')
+    $timeNowInWarsaw = [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($timeNow, 'Central European Standard Time')
+
+    $timeInKyiv = $timeNowInKyiv.ToShortTimeString()
+    $timeInWarsaw = $timeNowInWarsaw.ToShortTimeString()
+
+    Write-Host "🤍❤️ $timeInWarsaw Warsaw    💙💛 $timeInKyiv Kyiv"
+}
+
 if ($IsWindows) {
     Import-Module -Name Recycle
 
@@ -35,6 +51,8 @@ if ($host.Name -eq 'ConsoleHost') {
 
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal') -or ($env:TERM_PROGRAM -eq 'Apple_Terminal')) {
     Show-Calendar
+
+    Show-Time
 
     # PowerShell parameter completion shim for the WinGet
     Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
