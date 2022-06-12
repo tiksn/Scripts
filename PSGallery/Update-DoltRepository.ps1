@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.0.1
+.VERSION 1.1.0
 
 .GUID 0e6806b4-048d-4d8b-a863-2213301ab18e
 
@@ -47,17 +47,21 @@ Param(
     # Gets the Dolt repositories in the specified locations and in all sub-directories.
     [Parameter()]
     [switch]
-    $Recurse
+    $Recurse,
+    # Cleans up unreferenced data from the repository.
+    [Parameter()]
+    [switch]
+    $CollectGarbage
 )
 
 function IsDoltRepository {
     param (
-        [Parameter(Mandatory = $true, HelpMessage = "Path to one locations.")]
+        [Parameter(Mandatory = $true, HelpMessage = 'Path to one locations.')]
         [ValidateNotNullOrEmpty()]
         [string]
         $Path
     )
-    $doltDirectoryPath = Join-Path -Path $Path -ChildPath ".dolt"
+    $doltDirectoryPath = Join-Path -Path $Path -ChildPath '.dolt'
     if (Test-Path -Path $doltDirectoryPath) {
         $doltItem = Get-Item $doltDirectoryPath
 
@@ -75,14 +79,17 @@ function IsDoltRepository {
 
 function UpdateDoltRepository {
     param (
-        [Parameter(Mandatory = $true, HelpMessage = "Path to one locations.")]
+        [Parameter(Mandatory = $true, HelpMessage = 'Path to one locations.')]
         [ValidateNotNullOrEmpty()]
         [string]
         $Path,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [object]
-        $ScriptCmdlet
+        $ScriptCmdlet,
+        [Parameter()]
+        [switch]
+        $CollectGarbage
     )
     
     Push-Location
@@ -93,10 +100,15 @@ function UpdateDoltRepository {
         Write-Progress -Id 2087581109 -Activity "Fetching $Path"
         dolt fetch
         if ($?) {
-            if ($ScriptCmdlet.ShouldProcess($Path, "Pull Dolt remote changes")) {
+            if ($ScriptCmdlet.ShouldProcess($Path, 'Pull Dolt remote changes')) {
                 Write-Progress -Id 2087581109 -Activity "Pulling $Path"
                 dolt pull
             }
+        }
+
+        if ($CollectGarbage.IsPresent) {
+            Write-Progress -Id 2087581109 -Activity "Collect Garbage $Path"
+            dolt gc
         }
     }
     finally {
@@ -107,23 +119,26 @@ function UpdateDoltRepository {
 
 function UpdateDoltRepositories {
     param (
-        [Parameter(Mandatory = $true, HelpMessage = "Path to one locations.")]
+        [Parameter(Mandatory = $true, HelpMessage = 'Path to one locations.')]
         [ValidateNotNullOrEmpty()]
         [string]
         $Path,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [object]
-        $ScriptCmdlet
+        $ScriptCmdlet,
+        [Parameter()]
+        [switch]
+        $CollectGarbage
     )
 
     $subDirectories = Get-ChildItem -Path $Path -Directory
     foreach ($subDirectory in $subDirectories) {
         if (IsDoltRepository -Path $subDirectory) {
-            UpdateDoltRepository -Path $subDirectory -ScriptCmdlet $ScriptCmdlet
+            UpdateDoltRepository -Path $subDirectory -ScriptCmdlet $ScriptCmdlet -CollectGarbage:$CollectGarbage
         }
         else {
-            UpdateDoltRepositories -Path $subDirectory -ScriptCmdlet $ScriptCmdlet
+            UpdateDoltRepositories -Path $subDirectory -ScriptCmdlet $ScriptCmdlet -CollectGarbage:$CollectGarbage
         }
     }
 }
@@ -136,10 +151,10 @@ else {
     $ScriptCmdlet = $PSCmdlet
     if ($parentDirectory.PSIsContainer) {
         if (IsDoltRepository -Path $parentDirectory) {
-            UpdateDoltRepository -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet
+            UpdateDoltRepository -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet -CollectGarbage:$CollectGarbage
         }
         elseif ($Recurse) {
-            UpdateDoltRepositories -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet
+            UpdateDoltRepositories -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet -CollectGarbage:$CollectGarbage
         }
         else {
             Write-Error -Message "$Path is not a dolt repository directory." -Category InvalidArgument
@@ -150,4 +165,4 @@ else {
     }
 }
 
-Write-Progress -Id 2087581109 -Activity "Finished" -Completed
+Write-Progress -Id 2087581109 -Activity 'Finished' -Completed
