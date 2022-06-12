@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.0.1
+.VERSION 1.1.0
 
 .GUID ae0a8e93-0a77-4fb7-9837-64776641fc34
 
@@ -47,7 +47,11 @@ Param(
     # Gets the Git repositories in the specified locations and in all sub-directories.
     [Parameter()]
     [switch]
-    $Recurse
+    $Recurse,
+    # Cleanup unnecessary files and optimize the local repository.
+    [Parameter()]
+    [switch]
+    $CollectGarbage
 )
 
 function IsGitRepository {
@@ -83,7 +87,10 @@ function UpdateGitRepository {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [object]
-        $ScriptCmdlet
+        $ScriptCmdlet,
+        [Parameter()]
+        [switch]
+        $CollectGarbage
     )
     
     Push-Location
@@ -98,6 +105,11 @@ function UpdateGitRepository {
                 Write-Progress -Id 2087581109 -Activity "Pulling $Path"
                 git pull --recurse-submodules=yes --ff-only --rebase=true
             }
+        }
+
+        if ($CollectGarbage.IsPresent) {
+            Write-Progress -Id 2087581109 -Activity "Collect Garbage $Path"
+            git gc
         }
     }
     finally {
@@ -115,16 +127,19 @@ function UpdateGitRepositories {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [object]
-        $ScriptCmdlet
+        $ScriptCmdlet,
+        [Parameter()]
+        [switch]
+        $CollectGarbage
     )
 
     $subDirectories = Get-ChildItem -Path $Path -Directory
     foreach ($subDirectory in $subDirectories) {
         if (IsGitRepository -Path $subDirectory) {
-            UpdateGitRepository -Path $subDirectory -ScriptCmdlet $ScriptCmdlet
+            UpdateGitRepository -Path $subDirectory -ScriptCmdlet $ScriptCmdlet -CollectGarbage:$CollectGarbage
         }
         else {
-            UpdateGitRepositories -Path $subDirectory -ScriptCmdlet $ScriptCmdlet
+            UpdateGitRepositories -Path $subDirectory -ScriptCmdlet $ScriptCmdlet -CollectGarbage:$CollectGarbage
         }
     }
 }
@@ -139,10 +154,10 @@ if ($?) {
         $ScriptCmdlet = $PSCmdlet
         if ($parentDirectory.PSIsContainer) {
             if (IsGitRepository -Path $parentDirectory) {
-                UpdateGitRepository -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet
+                UpdateGitRepository -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet -CollectGarbage:$CollectGarbage
             }
             elseif ($Recurse) {
-                UpdateGitRepositories -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet
+                UpdateGitRepositories -Path $parentDirectory -ScriptCmdlet $ScriptCmdlet -CollectGarbage:$CollectGarbage
             }
             else {
                 Write-Error -Message "$resolvedPath is not a git repository directory." -Category InvalidArgument
