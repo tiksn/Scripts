@@ -35,7 +35,8 @@ elseif ($IsLinux) {
 if ($host.Name -eq 'ConsoleHost') {
     Import-Module -Name PSReadLine
 
-    # Import-Module Az.Tools.Predictor
+    # Import-Module -Name Az.Tools.Predictor
+    Import-Module -Name CompletionPredictor
     Set-PSReadLineOption -PredictionSource HistoryAndPlugin
     Set-PSReadLineOption -PredictionViewStyle ListView
 
