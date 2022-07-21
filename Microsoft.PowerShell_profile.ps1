@@ -167,7 +167,7 @@ if (-not (Test-Path -Path $PowerShellTranscriptsPath)) {
     New-Item -Path $PowerShellTranscriptsPath -ItemType Directory
 }
 
-$TranscriptDate = Get-Date -Format 'yyyy-MM-dd--hh-mm-ss'
+$TranscriptDate = Get-Date -Format 'yyyy-MM-dd--HH-mm-ss'
 $instanceId = $Host.InstanceId
 $TranscriptFilePath = Join-Path -Path $PowerShellTranscriptsPath -ChildPath "$TranscriptDate $instanceId.txt"
 
