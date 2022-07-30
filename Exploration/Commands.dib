@@ -1,6 +1,13 @@
 #!pwsh
 
 $commands = Get-Command -All -CommandType All
+
+#!pwsh
+
+$commands = $commands | Where-Object { (-not $PSItem.Source) -or (-not $PSItem.Source.StartsWith('Microsoft.Graph')) }
+
+#!pwsh
+
 $commands = $commands | Select-Object -Unique Name
 
 #!pwsh
@@ -14,7 +21,3 @@ Get-Command -Name $command.Name
 #!pwsh
 
 Get-Command -Name $command.Name -Syntax
-
-#!pwsh
-
-Get-Help -Name $command.Name
