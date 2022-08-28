@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.1.1
+.VERSION 1.1.2
 
 .GUID 3aedfc83-f65b-4724-b810-9d849563645d
 
@@ -147,6 +147,8 @@ foreach ($package in $(dotnet tool list --global | Select-Object -Skip 2)) {
     }
 }
 
+Write-Progress -Activity 'Update .NET Workloads' -Id 1478576163
+dotnet workload update
 Write-Progress -Activity 'Checking for .NET template updates' -Id 1478576163
 dotnet new --update-check
 Write-Progress -Activity 'Applying .NET template updates' -Id 1478576163
