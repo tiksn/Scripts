@@ -1,6 +1,8 @@
 Import-Module -Name posh-git
 Import-Module -Name PowerShellHumanizer
 Import-Module -Name PSCalendar
+Import-Module -Name SecretManagementArgumentCompleter
+Import-SecretManagementArgumentCompleter
 
 function Show-Time {
     [CmdletBinding()]
