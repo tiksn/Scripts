@@ -20,20 +20,6 @@ function Show-Time {
     Write-Host "🤍❤️ $timeInWarsaw Warsaw    💙💛 $timeInKyiv Kyiv"
 }
 
-if ($IsWindows) {
-    Import-Module -Name Recycle
-
-    Set-Alias -Name trash -Value Remove-ItemSafely    
-}
-elseif ($IsMacOS) {
-    $env:PATH = "$env:PATH`:~/.local/share/powershell/Scripts"
-}
-elseif ($IsLinux) {
-    Get-Command -Name trash | Out-Null
-
-    $env:PATH = "$env:PATH`:~/.local/share/powershell/Scripts"
-}
-
 if ($host.Name -eq 'ConsoleHost') {
     Import-Module -Name PSReadLine
 
@@ -155,19 +141,6 @@ Invoke-Expression (& {
     $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
     (zoxide init --hook $hook powershell | Out-String)
 })
-
-function quit() {
-    [CmdletBinding()]
-    param (
-    )
-
-    $jobs = @(Get-Job | Where-Object { ($_.State -ne 'Completed') -and ($_.State -ne 'Disconnected') -and ($_.State -ne 'Failed') -and ($_.State -ne 'Stopped') }).Count
-    if ($jobs -gt 0) {
-        throw 'Not all jobs are finished'
-    }
-
-    exit
-}
 
 $PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath 'PowerShellTranscripts'
 
