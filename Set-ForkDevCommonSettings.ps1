@@ -12,6 +12,7 @@ $forkDevSettings.Pull_Rebase = $true
 $forkDevSettings.Pull_StashAndReapply = $true
 $forkDevSettings.CommitSpellCheckingMode = 1
 $forkDevSettings.CreateBranch_Checkout = $true
+$forkDevSettings.Track_StashAndReapply = $true
 $forkDevSettings.InteractiveRebase_CreateBackup = $true
 $forkDevSettings.ShellTool = @{
     'Type'            = 'WindowsTerminal'
