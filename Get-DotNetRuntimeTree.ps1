@@ -7,7 +7,7 @@ param(
 
 Import-Module powershell-yaml
 
-$response = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/dotnet/runtime/master/src/libraries/pkg/Microsoft.NETCore.Platforms/runtime.json"
+$response = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/dotnet/runtime/main/src/libraries/Microsoft.NETCore.Platforms/src/runtime.json"
 $runtimes = $response.runtimes
 
 function GetRuntimeTree {
