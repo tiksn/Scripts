@@ -15,10 +15,6 @@ $packages = $packages | Select-Object -Unique ID
 #!pwsh
 
 $package = $packages | Get-Random
-$package
-
-#!pwsh
-
 Find-WinGetPackage -ID $package.ID
 
 #!pwsh
