@@ -5,10 +5,22 @@
 #!pwsh
 
 Import-Module -Name Cobalt
-$packages = Find-WinGetPackage
+Get-WinGetSource
+
+#!pwsh
+
+$packages = Get-WinGetPackage
 $packages = $packages | Select-Object -Unique ID
 
 #!pwsh
 
 $package = $packages | Get-Random
+$package
+
+#!pwsh
+
+Find-WinGetPackage -ID $package.ID
+
+#!pwsh
+
 winget show --id $package.ID
