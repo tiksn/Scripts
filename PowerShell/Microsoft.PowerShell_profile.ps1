@@ -150,7 +150,7 @@ if (-not (Test-Path -Path $PowerShellTranscriptsPath)) {
 
 $TranscriptDate = Get-Date -Format 'yyyy-MM-dd--HH-mm-ss'
 $instanceId = $Host.InstanceId
-$TranscriptFilePath = Join-Path -Path $PowerShellTranscriptsPath -ChildPath "$TranscriptDate $instanceId.txt"
+$TranscriptFilePath = Join-Path -Path $PowerShellTranscriptsPath -ChildPath "$TranscriptDate--$instanceId.txt"
 
 Start-Transcript -Path $TranscriptFilePath -Append
 
