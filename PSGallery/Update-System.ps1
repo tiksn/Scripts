@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.1.2
+.VERSION 1.1.3
 
 .GUID 3aedfc83-f65b-4724-b810-9d849563645d
 
@@ -19,7 +19,7 @@
 
 .ICONURI
 
-.EXTERNALMODULEDEPENDENCIES 
+.EXTERNALMODULEDEPENDENCIES
 
 .REQUIREDSCRIPTS
 
@@ -30,18 +30,18 @@
 
 .PRIVATEDATA
 
-#> 
+#>
 
 #Requires -Module PSWindowsUpdate
 
 
 
-<# 
+<#
 
-.DESCRIPTION 
+.DESCRIPTION
  Update whole System
 
-#> 
+#>
 
 #Requires -RunAsAdministrator
 
@@ -80,7 +80,7 @@ if ($IsWindows) {
         scoop update
         scoop update '*'
     }
-    
+
     Write-Progress -Activity 'Updating Windows' -Id 1478576163
     Get-WUServiceManager | ForEach-Object { Install-WindowsUpdate -ServiceID $_.ServiceID -AcceptAll }
 }
@@ -149,10 +149,8 @@ foreach ($package in $(dotnet tool list --global | Select-Object -Skip 2)) {
 
 Write-Progress -Activity 'Update .NET Workloads' -Id 1478576163
 dotnet workload update
-Write-Progress -Activity 'Checking for .NET template updates' -Id 1478576163
-dotnet new --update-check
 Write-Progress -Activity 'Applying .NET template updates' -Id 1478576163
-dotnet new --update-apply
+dotnet new update
 
 Write-Progress -Activity 'Updating NPM Global Packages' -Id 1478576163
 if ($PSCmdlet.ShouldProcess('NPM Global Packages', 'Update all packages')) {
