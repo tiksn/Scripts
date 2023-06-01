@@ -4,7 +4,7 @@
 
 #!pwsh
 
-Import-Module -Name Cobalt
+Import-Module -Name 'Microsoft.WinGet.Client'
 Get-WinGetSource
 
 #!pwsh
