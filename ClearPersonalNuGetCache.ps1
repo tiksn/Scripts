@@ -8,6 +8,7 @@ $PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "tiksn-framewor
 $PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "tiksn-cake"
 $PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "tiksn-habitica"
 $PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "ROFSDB"
+$PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "smite-cli"
 
 foreach($PackagePath in $PackagePaths) {
     if (Test-Path -Path $PackagePath) {
