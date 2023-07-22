@@ -7,9 +7,8 @@ Import-SecretManagementArgumentCompleter
 function Show-Time {
     [CmdletBinding()]
     param (
-        
     )
-    
+
     $timeNow = Get-Date
     $timeNowInKyiv = [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($timeNow, 'FLE Standard Time')
     $timeNowInWarsaw = [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($timeNow, 'Central European Standard Time')
@@ -23,7 +22,8 @@ function Show-Time {
 if ($host.Name -eq 'ConsoleHost') {
     Import-Module -Name PSReadLine
 
-    # Import-Module -Name Az.Tools.Predictor
+    Import-Module -Name Az.Tools.Predictor
+    Enable-AzPredictor
     Import-Module -Name CompletionPredictor
     Set-PSReadLineOption -PredictionSource HistoryAndPlugin
     Set-PSReadLineOption -PredictionViewStyle ListView
@@ -36,6 +36,8 @@ if ($host.Name -eq 'ConsoleHost') {
         [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Get-ChildItem')
         [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
     }
+
+    Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 }
 
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal') -or ($env:TERM_PROGRAM -eq 'Apple_Terminal')) {
@@ -76,13 +78,31 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
         $rustupCompletion = [scriptblock]::Create($rustupCompletion)
         Invoke-Command -ScriptBlock $rustupCompletion
     }
-    
+
     # PowerShell parameter completion shim for the dotnet CLI
     Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
         param($commandName, $wordToComplete, $cursorPosition)
         dotnet complete --position $cursorPosition "$wordToComplete" | ForEach-Object {
             [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
         }
+    }
+
+    Register-ArgumentCompleter -Native -CommandName az -ScriptBlock {
+        param($commandName, $wordToComplete, $cursorPosition)
+        $completion_file = New-TemporaryFile
+        $env:ARGCOMPLETE_USE_TEMPFILES = 1
+        $env:_ARGCOMPLETE_STDOUT_FILENAME = $completion_file
+        $env:COMP_LINE = $wordToComplete
+        $env:COMP_POINT = $cursorPosition
+        $env:_ARGCOMPLETE = 1
+        $env:_ARGCOMPLETE_SUPPRESS_SPACE = 0
+        $env:_ARGCOMPLETE_IFS = "`n"
+        $env:_ARGCOMPLETE_SHELL = 'powershell'
+        az 2>&1 | Out-Null
+        Get-Content $completion_file | Sort-Object | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+        }
+        Remove-Item $completion_file, Env:\_ARGCOMPLETE_STDOUT_FILENAME, Env:\ARGCOMPLETE_USE_TEMPFILES, Env:\COMP_LINE, Env:\COMP_POINT, Env:\_ARGCOMPLETE, Env:\_ARGCOMPLETE_SUPPRESS_SPACE, Env:\_ARGCOMPLETE_IFS, Env:\_ARGCOMPLETE_SHELL
     }
 }
 
@@ -100,7 +120,7 @@ function prompt {
         1..$jobs | ForEach-Object { Write-Host '🔨' -NoNewline }
         Write-Host ' ' -NoNewline
     }
-    
+
     Try {
         $repoStatus = Get-GitStatus
         if ($null -eq $repoStatus) {
@@ -138,9 +158,9 @@ function prompt {
 
 # For zoxide v0.8.0+
 Invoke-Expression (& {
-    $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
-    (zoxide init --hook $hook powershell | Out-String)
-})
+        $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
+        (zoxide init --hook $hook powershell | Out-String)
+    })
 
 $PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath 'PowerShellTranscripts'
 
