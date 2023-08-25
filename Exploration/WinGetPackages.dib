@@ -9,7 +9,7 @@ Get-WinGetSource
 
 #!pwsh
 
-$packages = Get-WinGetPackage
+$packages = Find-WinGetPackage
 $packages = $packages | Select-Object -Unique ID
 
 #!pwsh
