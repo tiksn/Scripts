@@ -87,8 +87,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
         }
         Remove-Item $completion_file, Env:\_ARGCOMPLETE_STDOUT_FILENAME, Env:\ARGCOMPLETE_USE_TEMPFILES, Env:\COMP_LINE, Env:\COMP_POINT, Env:\_ARGCOMPLETE, Env:\_ARGCOMPLETE_SUPPRESS_SPACE, Env:\_ARGCOMPLETE_IFS, Env:\_ARGCOMPLETE_SHELL
     }
-
-    Invoke-Expression (& { (zoxide init powershell | Out-String) })
 }
 
 function prompt {
@@ -140,6 +138,8 @@ function prompt {
 
     return ' '
 }
+
+Invoke-Expression (& { (zoxide init powershell | Out-String) })
 
 $PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath 'PowerShellTranscripts'
 
