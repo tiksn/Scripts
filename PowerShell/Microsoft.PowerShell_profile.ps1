@@ -162,6 +162,22 @@ else {
         $env:POSH_THEMES_PATH = "$(brew --prefix oh-my-posh)/themes"
     }
 
-    oh-my-posh --init --shell pwsh --config $env:POSH_THEMES_PATH/free-ukraine.omp.json | Invoke-Expression
-    # oh-my-posh --init --shell pwsh --config $env:POSH_THEMES_PATH/unicorn.omp.json | Invoke-Expression
+    Copy-Item -Path $env:POSH_THEMES_PATH/powerlevel10k_rainbow.omp.json -Destination $HOME/theme.omp.json -Force
+    # Copy-Item -Path $env:POSH_THEMES_PATH/kushal.omp.json -Destination $HOME/theme.omp.json -Force
+    # Copy-Item -Path $env:POSH_THEMES_PATH/free-ukraine.omp.json -Destination $HOME/theme.omp.json -Force
+    $ompTheme = Get-Content -Path $HOME/theme.omp.json | ConvertFrom-Json -Depth 100
+    $timeSegment = $ompTheme.blocks | Select-Object -ExpandProperty segments | Where-Object { $PSItem.type -eq 'time' }
+    if ($null -eq $timeSegment.PSObject.Properties.Item('properties')) {
+        $timeSegment | Add-Member -MemberType NoteProperty -Name properties -Value @{
+            time_format = '3:04 PM'
+        }
+    }
+    elseif ($null -ne $timeSegment.properties.PSObject.Properties.Item('time_format')) {
+        $timeSegment.properties.time_format = $timeSegment.properties.time_format -replace '15:04:05', '3:04:05 PM'
+        $timeSegment.properties.time_format = $timeSegment.properties.time_format -replace '_2,15:04', '_2, 3:04 PM'
+        $timeSegment.properties.time_format = $timeSegment.properties.time_format -replace '15:04', '3:04 PM'
+    }
+    $ompTheme.console_title_template = '{{ .Folder }}'
+    $ompTheme | ConvertTo-Json -Depth 100 | Set-Content -Path $HOME/theme.omp.json
+    oh-my-posh --init --shell pwsh --config $HOME/theme.omp.json | Invoke-Expression
 }
