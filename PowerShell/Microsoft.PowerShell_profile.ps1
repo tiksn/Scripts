@@ -4,21 +4,6 @@ Import-Module -Name PSCalendar
 Import-Module -Name SecretManagementArgumentCompleter
 Import-SecretManagementArgumentCompleter
 
-function Show-Time {
-    [CmdletBinding()]
-    param (
-    )
-
-    $timeNow = Get-Date
-    $timeNowInKyiv = [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($timeNow, 'FLE Standard Time')
-    $timeNowInWarsaw = [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($timeNow, 'Central European Standard Time')
-
-    $timeInKyiv = $timeNowInKyiv.ToShortTimeString()
-    $timeInWarsaw = $timeNowInWarsaw.ToShortTimeString()
-
-    Write-Host "🤍❤️ $timeInWarsaw Warsaw    💙💛 $timeInKyiv Kyiv"
-}
-
 if ($host.Name -eq 'ConsoleHost') {
     Import-Module -Name PSReadLine
 
@@ -42,8 +27,6 @@ if ($host.Name -eq 'ConsoleHost') {
 
 if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal') -or ($env:TERM_PROGRAM -eq 'Apple_Terminal')) {
     Show-Calendar
-
-    Show-Time
 
     # PowerShell parameter completion shim for the WinGet
     Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
