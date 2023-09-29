@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.1.3
+.VERSION 1.1.4
 
 .GUID 3aedfc83-f65b-4724-b810-9d849563645d
 
@@ -87,7 +87,16 @@ if ($IsWindows) {
 
 if ($IsMacOS) {
     Write-Progress -Activity 'Updating Homebrew packages' -Id 1478576163
+    brew update
+
+    Write-Progress -Activity 'Upgrade Homebrew packages' -Id 1478576163
+    brew upgrade
+
+    Write-Progress -Activity 'Updating Homebrew cask packages' -Id 1478576163
     brew upgrade --cask
+
+    Write-Progress -Activity 'Cleanup Homebrew packages' -Id 1478576163
+    brew cleanup
 }
 
 if ($IsLinux) {
