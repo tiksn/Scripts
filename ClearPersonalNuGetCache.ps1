@@ -1,16 +1,30 @@
 $UserFolder = [Environment]::GetFolderPath('UserProfile')
 
-$NuGetPackagesFolder = Join-Path -Path $UserFolder -ChildPath ".nuget\packages"
+$NuGetPackagesFolder = Join-Path -Path $UserFolder -ChildPath '.nuget\packages'
 
-$PackagePaths = @()
+$NuGetPackagesFolders = Get-ChildItem -Path $NuGetPackagesFolder
+$NuSpecPaths = foreach ($NuGetPackageFolder in $NuGetPackagesFolders) {
+    $NuGetPackageVersionFolders = Get-ChildItem -Path $NuGetPackageFolder
+    foreach ($NuGetPackageVersionFolder in $NuGetPackageVersionFolders) {
+        $nuspecFiles = Get-ChildItem -Path $NuGetPackageVersionFolder -Filter *.nuspec
+        $nuspecFiles
+    }
+}
 
-$PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "tiksn-framework"
-$PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "tiksn-cake"
-$PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "tiksn-habitica"
-$PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "ROFSDB"
-$PackagePaths += Join-Path -Path $NuGetPackagesFolder -ChildPath "smite-cli"
+$MyPackageIds = $NuSpecPaths | ForEach-Object {
+    [xml]$xml = Get-Content -Path $PSItem
+    $packageElement = $xml.DocumentElement | Where-Object { $PSItem.Name -eq 'package' }
+    $metadataElement = $packageElement.ChildNodes | Where-Object { $PSItem.Name -eq 'metadata' }
+    $idElement = $metadataElement.ChildNodes | Where-Object { $PSItem.Name -eq 'id' }
+    $authorsElement = $metadataElement.ChildNodes | Where-Object { $PSItem.Name -eq 'authors' }
+    if ('TIKSN' -eq $authorsElement.InnerText) {
+        $idElement.InnerText
+    }
+}
+| Select-Object -Unique
 
-foreach($PackagePath in $PackagePaths) {
+foreach ($MyPackageId in $MyPackageIds) {
+    $PackagePath = Join-Path -Path $NuGetPackagesFolder -ChildPath $MyPackageId
     if (Test-Path -Path $PackagePath) {
         Write-Host "Deleting $PackagePath"
         Remove-Item -Path $PackagePath -Force -Recurse
