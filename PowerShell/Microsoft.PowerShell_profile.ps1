@@ -46,6 +46,11 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
     $ghCompletion = [scriptblock]::Create($ghCompletion)
     Invoke-Command -ScriptBlock $ghCompletion
 
+    # Dapr CLI
+    $daprCliCompletion = dapr completion powershell | Join-String -Separator ([System.Environment]::NewLine)
+    $daprCliCompletion = [scriptblock]::Create($daprCliCompletion)
+    Invoke-Command -ScriptBlock $daprCliCompletion
+
     if (Get-Command rustup -ErrorAction Ignore) {
         # PowerShell parameter completion shim for the Rustup
         rustup completions powershell rustup | Set-Variable -Name rustupCompletion
