@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.1.4
+.VERSION 1.2.0
 
 .GUID 3aedfc83-f65b-4724-b810-9d849563645d
 
@@ -47,12 +47,12 @@
 
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
 Param ()
-Write-Progress -Activity 'Updating PowerShell Modules for Current Users' -Id 1478576163
-Update-Module -Scope CurrentUser -AcceptLicense
-Write-Progress -Activity 'Updating PowerShell Modules for All Users' -Id 1478576163
-Update-Module -Scope AllUsers -AcceptLicense
-Write-Progress -Activity 'Updating PowerShell Scripts' -Id 1478576163
-Update-Script -AcceptLicense
+
+Write-Progress -Activity 'Updating PowerShell Resources for Current Users' -Id 1478576163
+Update-PSResource -Scope CurrentUser -TrustRepository -AcceptLicense
+Write-Progress -Activity 'Updating PowerShell Resources for All Users' -Id 1478576163
+Update-PSResource -Scope AllUsers -TrustRepository -AcceptLicense
+
 Write-Progress -Activity 'Updating PowerShell Help files' -Id 1478576163
 Update-Help
 
