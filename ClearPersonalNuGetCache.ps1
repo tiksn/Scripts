@@ -17,7 +17,7 @@ $MyPackageIds = $NuSpecPaths | ForEach-Object {
     $metadataElement = $packageElement.ChildNodes | Where-Object { $PSItem.Name -eq 'metadata' }
     $idElement = $metadataElement.ChildNodes | Where-Object { $PSItem.Name -eq 'id' }
     $authorsElement = $metadataElement.ChildNodes | Where-Object { $PSItem.Name -eq 'authors' }
-    if ('TIKSN' -eq $authorsElement.InnerText) {
+    if (('TIKSN' -eq $authorsElement.InnerText) -or ($authorsElement.InnerText -like 'TIKSN.*')) {
         $idElement.InnerText
     }
 }
