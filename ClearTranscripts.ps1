@@ -4,6 +4,9 @@ if ($IsWindows) {
 elseif ($IsLinux) {
     Set-Alias -Name 'Remove-ItemSafely' -Value 'trash' -Option Private -Scope Private
 }
+elseif ($IsMacOS) {
+    Set-Alias -Name 'Remove-ItemSafely' -Value 'trash' -Option Private -Scope Private
+}
 
 $PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath "PowerShellTranscripts"
 
