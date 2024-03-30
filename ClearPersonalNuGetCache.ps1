@@ -32,7 +32,9 @@ if (Test-Path -Path $NuGetPackagesFolder) {
         $PackagePath = Join-Path -Path $NuGetPackagesFolder -ChildPath $MyPackageId
         if (Test-Path -Path $PackagePath) {
             Write-Host "Deleting $PackagePath"
-            Remove-Item -Path $PackagePath -Force -Recurse
+            if (Test-Path -Path $PackagePath) {
+                Remove-Item -Path $PackagePath -Force -Recurse
+            }
         }
     }
 }
