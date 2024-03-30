@@ -5,10 +5,14 @@ $NuGetPackagesFolder = Join-Path -Path $UserFolder -ChildPath '.nuget\packages'
 if (Test-Path -Path $NuGetPackagesFolder) {
     $NuGetPackagesFolders = Get-ChildItem -Path $NuGetPackagesFolder
     $NuSpecPaths = foreach ($NuGetPackageFolder in $NuGetPackagesFolders) {
-        $NuGetPackageVersionFolders = Get-ChildItem -Path $NuGetPackageFolder
-        foreach ($NuGetPackageVersionFolder in $NuGetPackageVersionFolders) {
-            $nuspecFiles = Get-ChildItem -Path $NuGetPackageVersionFolder -Filter *.nuspec
-            $nuspecFiles
+        if (Test-Path -Path $NuGetPackageFolder) {
+            $NuGetPackageVersionFolders = Get-ChildItem -Path $NuGetPackageFolder
+            foreach ($NuGetPackageVersionFolder in $NuGetPackageVersionFolders) {
+                if (Test-Path -Path $NuGetPackageVersionFolder) {
+                    $nuspecFiles = Get-ChildItem -Path $NuGetPackageVersionFolder -Filter *.nuspec
+                    $nuspecFiles
+                }
+            }
         }
     }
 
