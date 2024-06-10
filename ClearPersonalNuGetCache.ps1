@@ -38,3 +38,5 @@ if (Test-Path -Path $NuGetPackagesFolder) {
         }
     }
 }
+
+dotnet nuget locals http-cache --clear
