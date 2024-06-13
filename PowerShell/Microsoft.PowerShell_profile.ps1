@@ -28,7 +28,7 @@ if ($host.Name -eq 'ConsoleHost') {
     [System.Console]::InputEncoding = [System.Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 }
 
-if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal') -or ($env:TERM_PROGRAM -eq 'Apple_Terminal')) {
+if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal') -or ($env:TERM_PROGRAM -eq 'Apple_Terminal') -or ($env:TERM_PROGRAM -eq 'iTerm.app')) {
     Show-Calendar
 
     # PowerShell parameter completion shim for the WinGet
