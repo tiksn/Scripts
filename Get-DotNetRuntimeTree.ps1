@@ -2,12 +2,15 @@
 param(
     [Parameter(Mandatory = $true)]
     [string]
-    $RID
+    $RID,
+    [Parameter()]
+    [switch]
+    $Reverse
 )
 
 Import-Module powershell-yaml
 
-$response = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/dotnet/runtime/main/src/libraries/Microsoft.NETCore.Platforms/src/runtime.json"
+$response = Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/dotnet/runtime/main/src/libraries/Microsoft.NETCore.Platforms/src/runtime.json'
 $runtimes = $response.runtimes
 
 function GetRuntimeTree {
@@ -15,33 +18,52 @@ function GetRuntimeTree {
     param (
         [Parameter(Mandatory = $true)]
         [string]
-        $RID
+        $RID,
+        [Parameter()]
+        [switch]
+        $Reverse
     )
-    
+
     begin {
-        
+
     }
-    
+
     process {
         $runtime = $runtimes.$RID
-        $imports = @()
-        foreach ($import in $runtime.'#import') {
-            $imports += GetRuntimeTree -RID $import
+
+        if ($Reverse) {
+            foreach ($currentRuntimePair in $runtimes.PSObject.Properties) {
+                $currentRuntime = $currentRuntimePair.Name
+                foreach ($import in $currentRuntimePair.Value.'#import') {
+                    if ($RID -eq $import) {
+                        [PSCustomObject]@{
+                            RID     = $currentRuntime
+                            Imports = $currentRuntimePair.Value.'#import'
+                        }
+                    }
+                }
+            }
         }
-        # @{$RID = $subrids }
-        [PSCustomObject]@{
-            RID = $RID
-            Imports = $imports
+        else {
+            $imports = @()
+            foreach ($import in $runtime.'#import') {
+                $imports += GetRuntimeTree -RID $import
+            }
+            # @{$RID = $subrids }
+            [PSCustomObject]@{
+                RID     = $RID
+                Imports = $imports
+            }
         }
     }
-    
+
     end {
-        
+
     }
 }
 
 $tree = @()
-$tree += GetRuntimeTree -RID $RID
+$tree += GetRuntimeTree -RID $RID -Reverse:$Reverse
 # $tree | Format-Custom -Depth 1000
 
 $tree | ConvertTo-Yaml
