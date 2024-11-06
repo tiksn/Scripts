@@ -187,5 +187,5 @@ else {
     }
     $ompTheme.console_title_template = '{{ .Folder }}'
     $ompTheme | ConvertTo-Json -Depth 100 | Set-Content -Path $HOME/theme.omp.json
-    oh-my-posh --init --shell pwsh --config $HOME/theme.omp.json | Invoke-Expression
+    oh-my-posh init pwsh --config $HOME/theme.omp.json | Invoke-Expression
 }
