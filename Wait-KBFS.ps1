@@ -6,7 +6,7 @@ while ($true) {
     try {
         $drive = keybase kbfsmount get
         $drivePath = Resolve-Path -Path $drive
-    
+
         if (-not $drivePath) {
             throw 'KBFS drive path could not br resolved'
         }
