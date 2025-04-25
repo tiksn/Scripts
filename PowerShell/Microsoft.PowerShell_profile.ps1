@@ -3,7 +3,6 @@ Import-Module -Name PowerShellHumanizer
 Import-Module -Name PSCalendar
 Import-Module -Name SecretManagementArgumentCompleter
 Import-SecretManagementArgumentCompleter
-Import-Module -Name F7History
 
 if ($host.Name -eq 'ConsoleHost') {
     Import-Module -Name PSReadLine
