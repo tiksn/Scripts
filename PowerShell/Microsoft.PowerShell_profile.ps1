@@ -7,8 +7,8 @@ Import-SecretManagementArgumentCompleter
 if ($host.Name -eq 'ConsoleHost') {
     Import-Module -Name PSReadLine
 
-    Import-Module -Name Az.Tools.Predictor
-    Enable-AzPredictor
+    # Import-Module -Name Az.Tools.Predictor
+    # Enable-AzPredictor
     Import-Module -Name CompletionPredictor
     Set-PSReadLineOption -PredictionSource HistoryAndPlugin
     Set-PSReadLineOption -PredictionViewStyle ListView
