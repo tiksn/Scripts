@@ -98,18 +98,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
 
 Invoke-Expression (& { (zoxide init powershell | Out-String) })
 
-$PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath 'PowerShellTranscripts'
-
-if (-not (Test-Path -Path $PowerShellTranscriptsPath)) {
-    New-Item -Path $PowerShellTranscriptsPath -ItemType Directory
-}
-
-$TranscriptDate = Get-Date -Format 'yyyy-MM-dd--HH-mm-ss'
-$instanceId = $Host.InstanceId
-$TranscriptFilePath = Join-Path -Path $PowerShellTranscriptsPath -ChildPath "$TranscriptDate--$instanceId.txt"
-
-Start-Transcript -Path $TranscriptFilePath -Append
-
 if ($env:WT_PROFILE_ID -eq '{2595cd9c-8f05-55ff-a1d4-93f3041ca67f}') {
     # PowerShell Preview
     Invoke-Expression (&starship init powershell)
