@@ -4,7 +4,7 @@ Import-Module -Name PSCalendar
 Import-Module -Name SecretManagementArgumentCompleter
 Import-SecretManagementArgumentCompleter
 
-if ($host.Name -eq 'ConsoleHost') {
+if ($Host.Name -eq 'ConsoleHost') {
     Import-Module -Name PSReadLine
 
     # Import-Module -Name Az.Tools.Predictor
