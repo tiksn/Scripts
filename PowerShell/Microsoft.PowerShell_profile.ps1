@@ -96,56 +96,6 @@ if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or 
     }
 }
 
-function prompt {
-    $formattedTime = (Get-Date).ToShortTimeString()
-    $lastCmd = Get-History -Count 1
-    if ($null -ne $lastCmd -and $null -ne $lastCmd.Duration -and $lastCmd.Duration.TotalSeconds -gt 1) {
-        $lastCmdDuration = $lastCmd.Duration.Humanize()
-        Write-Host -Object "$lastCmdDuration" -NoNewline -ForegroundColor Magenta
-        Write-Host ' ' -NoNewline
-    }
-
-    $jobs = @(Get-Job | Where-Object { $_.State -eq 'Running' }).Count
-    if ($jobs -gt 0) {
-        1..$jobs | ForEach-Object { Write-Host '🔨' -NoNewline }
-        Write-Host ' ' -NoNewline
-    }
-
-    Try {
-        $repoStatus = Get-GitStatus
-        if ($null -eq $repoStatus) {
-            throw 'Not a git repository folder.'
-        }
-        Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor Black
-        Write-Host -Object ' ' -NoNewline
-        Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
-        Write-VcsStatus | Write-Host -NoNewline
-        Write-Host
-
-        $gitRootPath = (Split-Path (Get-GitDirectory) -Parent)
-        $gitFolderName = (Split-Path $gitRootPath -Leaf)
-        $subPath = $PWD.Path.Substring($gitRootPath.Length)
-        $subPath = $gitFolderName + $subPath
-        $pathParts = $subPath.Split([IO.Path]::DirectorySeparatorChar)
-        [array]::Reverse($pathParts)
-        $host.ui.RawUI.WindowTitle = $pathParts -join ' < '
-        # return "GIT $($executionContext.SessionState.Path.CurrentLocation) | $($repoStatus.CurrentBranch) $($repoStatus.Files.Count)`n$('>' * ($nestedPromptLevel + 1)) ";
-    }
-    Catch {
-        $repoStatus = $null;
-        Write-Host -Object $formattedTime -NoNewline -BackgroundColor Cyan -ForegroundColor Black
-        Write-Host -Object ' ' -NoNewline
-        Write-Host -Object $executionContext.SessionState.Path.CurrentLocation -NoNewline -BackgroundColor Black -ForegroundColor Gray
-        Write-Host
-
-        $host.ui.RawUI.WindowTitle = (Split-Path $PWD -Leaf)
-    }
-
-    Write-Host -Object "$('>' * ($nestedPromptLevel + 1))" -NoNewline
-
-    return ' '
-}
-
 Invoke-Expression (& { (zoxide init powershell | Out-String) })
 
 $PowerShellTranscriptsPath = Join-Path -Path $HOME -ChildPath 'PowerShellTranscripts'
