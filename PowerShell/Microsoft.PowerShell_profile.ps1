@@ -12,6 +12,7 @@ if ($Host.Name -eq 'ConsoleHost') {
     Import-Module -Name CompletionPredictor
     Set-PSReadLineOption -PredictionSource HistoryAndPlugin
     Set-PSReadLineOption -PredictionViewStyle ListView
+    Set-PSReadLineOption -EditMode Windows 
 
     Set-PSReadLineKeyHandler -Key Ctrl+Shift+l `
         -BriefDescription ListCurrentDirectory `
