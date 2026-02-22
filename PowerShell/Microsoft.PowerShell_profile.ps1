@@ -106,6 +106,7 @@ if ($env:WT_PROFILE_ID -eq '{2595cd9c-8f05-55ff-a1d4-93f3041ca67f}') {
 else {
     if ($IsMacOS) {
         $env:POSH_THEMES_PATH = "$(brew --prefix oh-my-posh)/themes"
+        $env:PATH += ':~/.aspire/bin'
     }
 
     Copy-Item -Path $env:POSH_THEMES_PATH/powerlevel10k_rainbow.omp.json -Destination $HOME/theme.omp.json -Force
