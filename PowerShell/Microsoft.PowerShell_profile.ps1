@@ -12,7 +12,7 @@ if ($Host.Name -eq 'ConsoleHost') {
     Import-Module -Name CompletionPredictor
     Set-PSReadLineOption -PredictionSource HistoryAndPlugin
     Set-PSReadLineOption -PredictionViewStyle ListView
-    Set-PSReadLineOption -EditMode Windows 
+    Set-PSReadLineOption -EditMode Windows
 
     Set-PSReadLineKeyHandler -Key Ctrl+Shift+l `
         -BriefDescription ListCurrentDirectory `
@@ -28,7 +28,7 @@ if ($Host.Name -eq 'ConsoleHost') {
     [System.Console]::InputEncoding = [System.Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 }
 
-if ($env:WT_SESSION -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal') -or ($env:TERM_PROGRAM -eq 'Apple_Terminal') -or ($env:TERM_PROGRAM -eq 'iTerm.app')) {
+if (($env:WT_SESSION -and $null -eq $env:TERM_PROGRAM) -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal') -or ($env:TERM_PROGRAM -eq 'Apple_Terminal') -or ($env:TERM_PROGRAM -eq 'iTerm.app')) {
     Show-Calendar
 
     # PowerShell parameter completion shim for the WinGet
