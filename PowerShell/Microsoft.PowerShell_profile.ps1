@@ -99,6 +99,19 @@ if (($env:WT_SESSION -and $null -eq $env:TERM_PROGRAM) -or $env:TERMINATOR_UUID 
 
 Invoke-Expression (& { (zoxide init powershell | Out-String) })
 
+$global:IsRunningInIntegratedDevelopmentEnvironment = $false
+
+if ($env:TERM_PROGRAM -in @('vscode', 'cursor') -or
+    $null -ne $env:VSCODE_PID -or
+    $null -ne $env:ANTIGRAVITY_EDITOR_APP_ROOT -or
+    $env:TERMINAL_EMULATOR -match 'JetBrains' -or
+    $null -ne $env:IDEA_INITIAL_DIRECTORY -or
+    $env:VSAPPIDNAME -eq 'devenv.exe' -or
+    $null -ne $env:VSINSTALLDIR) {
+    $global:IsRunningInIntegratedDevelopmentEnvironment = $true
+}
+$env:IsRunningInIntegratedDevelopmentEnvironment = $global:IsRunningInIntegratedDevelopmentEnvironment.ToString()
+
 if ($env:WT_PROFILE_ID -eq '{2595cd9c-8f05-55ff-a1d4-93f3041ca67f}') {
     # PowerShell Preview
     Invoke-Expression (&starship init powershell)
