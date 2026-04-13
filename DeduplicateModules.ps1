@@ -33,16 +33,16 @@ $innerProgressId = 2
 
 foreach ($group in $multiversionGroups) {
     $outerIndex = [array]::IndexOf($multiversionGroups, $group)
+    $sortedModules = $group.Group | Sort-Object -Property Version -Descending
+    $latestVersion = $sortedModules | Select-Object -First 1 -ExpandProperty Version
+    $allVersions = ($sortedModules | ForEach-Object { $PSItem.Version }) -join ', '
     $outerProgressParams = @{
         Id              = $outerProgressId
         Activity        = 'Uninstalling older versions'
-        Status          = $group.Name
+        Status          = "$($group.Name) — versions: $allVersions (keeping $latestVersion)"
         PercentComplete = (($outerIndex + 1) * 100 / $multiversionGroups.Count)
     }
     Write-Progress @outerProgressParams
-
-    $sortedModules = $group.Group | Sort-Object -Property Version -Descending
-    $latestVersion = $sortedModules | Select-Object -First 1 -ExpandProperty Version
     $olderModules = $sortedModules |
     Where-Object { $PSItem.Version -lt $latestVersion } |
     Sort-Object -Property Version
@@ -62,7 +62,7 @@ foreach ($group in $multiversionGroups) {
         Write-Verbose -Message "Uninstalling older version of $($olderModule.Name) $($olderModule.Version) (latest $latestVersion)"
 
         if ($PSCmdlet.ShouldProcess($olderModule.Name, $actionMessage)) {
-            Uninstall-Module -Name $olderModule.Name -RequiredVersion $olderModule.Version
+            Uninstall-PSResource -Name $olderModule.Name -Version $olderModule.Version
         }
 
         Write-Progress -Id $innerProgressId -Activity 'Uninstalling older version' -Completed
