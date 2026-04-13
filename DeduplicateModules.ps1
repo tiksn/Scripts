@@ -1,24 +1,72 @@
-[CmdletBinding()]
-param (
-)
+<#
+.SYNOPSIS
+    Uninstalls older duplicate versions of installed PowerShell modules.
+
+.DESCRIPTION
+    Scans all installed modules, identifies modules with multiple versions,
+    and uninstalls all but the latest version of each. Supports -WhatIf and
+    -Confirm for safe operation.
+
+.EXAMPLE
+    .\DeduplicateModules.ps1 -Verbose
+    Uninstalls older module versions with verbose output.
+
+.EXAMPLE
+    .\DeduplicateModules.ps1 -WhatIf
+    Shows which modules would be uninstalled without making changes.
+#>
+[CmdletBinding(SupportsShouldProcess)]
+param ()
 
 $allModules = Get-Module -ListAvailable
-$moduleGroups = $allModules | Group-Object -Property Name
-$multiversionModuleGroups = $moduleGroups | Where-Object { $_.Count -gt 1 }
+$multiversionGroups = $allModules |
+Group-Object -Property Name |
+Where-Object { $PSItem.Count -gt 1 }
 
-for ($i = 0; $i -lt $multiversionModuleGroups.Count; $i++) {
-    $multiversionModuleGroup = $multiversionModuleGroups[$i]
-    $multiversionPID = Get-Random
-    Write-Progress -Id $multiversionPID -Activity 'Uninstalling older versions' -Status $multiversionModuleGroup.Name -PercentComplete (($i + 1) * 100 / $multiversionModuleGroups.Count)
-    $latestVersionModule = $multiversionModuleGroup.Group | Sort-Object -Descending -Property Version | Select-Object -First 1
-    $olderModules = $multiversionModuleGroup.Group | Where-Object { $_.Version -lt $latestVersionModule.Version } | Sort-Object -Property Version
-    for ($j = 0; $j -lt $olderModules.Count; $j++) {
-        $olderModule = $olderModules[$j]
-        Write-Verbose -Message "Uninstalling older version of $($olderModule.Name) $($olderModule.Version) (latest $($latestVersionModule.Version))"
-        $versionPID = Get-Random
-        Write-Progress -Id $versionPID -ParentId $multiversionPID -Activity 'Uninstalling older version' -Status "$($olderModule.Version) (latest $($latestVersionModule.Version))" -PercentComplete (($j + 1) * 100 / $olderModules.Count)
-        Uninstall-Module -Name $olderModule.Name -RequiredVersion $olderModule.Version
-        Write-Progress -Id $versionPID -Activity 'Uninstalling older version' -Completed
+if (-not $multiversionGroups) {
+    Write-Verbose -Message 'No duplicate module versions found.'
+    return
+}
+
+$outerProgressId = 1
+$innerProgressId = 2
+
+foreach ($group in $multiversionGroups) {
+    $outerIndex = [array]::IndexOf($multiversionGroups, $group)
+    $outerProgressParams = @{
+        Id              = $outerProgressId
+        Activity        = 'Uninstalling older versions'
+        Status          = $group.Name
+        PercentComplete = (($outerIndex + 1) * 100 / $multiversionGroups.Count)
     }
-    Write-Progress -Id $multiversionPID -Activity 'Uninstalling older versions' -Completed
+    Write-Progress @outerProgressParams
+
+    $sortedModules = $group.Group | Sort-Object -Property Version -Descending
+    $latestVersion = $sortedModules | Select-Object -First 1 -ExpandProperty Version
+    $olderModules = $sortedModules |
+    Where-Object { $PSItem.Version -lt $latestVersion } |
+    Sort-Object -Property Version
+
+    foreach ($olderModule in $olderModules) {
+        $innerIndex = [array]::IndexOf($olderModules, $olderModule)
+        $innerProgressParams = @{
+            Id              = $innerProgressId
+            ParentId        = $outerProgressId
+            Activity        = 'Uninstalling older version'
+            Status          = "$($olderModule.Version) (latest $latestVersion)"
+            PercentComplete = (($innerIndex + 1) * 100 / $olderModules.Count)
+        }
+        Write-Progress @innerProgressParams
+
+        $actionMessage = "Uninstall $($olderModule.Name) $($olderModule.Version) (latest $latestVersion)"
+        Write-Verbose -Message "Uninstalling older version of $($olderModule.Name) $($olderModule.Version) (latest $latestVersion)"
+
+        if ($PSCmdlet.ShouldProcess($olderModule.Name, $actionMessage)) {
+            Uninstall-Module -Name $olderModule.Name -RequiredVersion $olderModule.Version
+        }
+
+        Write-Progress -Id $innerProgressId -Activity 'Uninstalling older version' -Completed
+    }
+
+    Write-Progress -Id $outerProgressId -Activity 'Uninstalling older versions' -Completed
 }
