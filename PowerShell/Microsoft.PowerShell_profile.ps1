@@ -107,6 +107,7 @@ else {
     if ($IsMacOS) {
         $env:POSH_THEMES_PATH = "$(brew --prefix oh-my-posh)/themes"
         $env:PATH += ':~/.aspire/bin'
+        $env:PATH += ':~/.local/bin'
     }
 
     Copy-Item -Path $env:POSH_THEMES_PATH/powerlevel10k_rainbow.omp.json -Destination $HOME/theme.omp.json -Force
