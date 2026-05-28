@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.1.0
+.VERSION 1.1.1
 
 .GUID 60c7add9-8abb-413c-aadc-9f3643e1e56e
 
@@ -61,9 +61,11 @@ $passed = $instantNow - $epochStarts
 $passedTotalSeconds = [int]$passed.TotalSeconds
 
 Write-PSFMessage -Level Verbose -Message "Total $passedTotalSeconds Seconds passed"
-if ( $CopyToClipboard) {
+if ($CopyToClipboard) {
     $passedTotalSeconds | Set-Clipboard
     Write-PSFMessage -Level Important -Message "Copied $passedTotalSeconds to Clipboard"
 }
 
 Write-Output $passedTotalSeconds
+
+Start-Sleep -Seconds 1
