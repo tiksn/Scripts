@@ -1,131 +1,195 @@
-Import-Module -Name posh-git
-Import-Module -Name PowerShellHumanizer
-Import-Module -Name PSCalendar
-Import-Module -Name SecretManagementArgumentCompleter
-Import-SecretManagementArgumentCompleter
+function Test-InteractiveConsole {
+    $Host.Name -eq 'ConsoleHost' -and
+    -not [System.Console]::IsInputRedirected -and
+    -not [System.Console]::IsOutputRedirected
+}
 
-if ($Host.Name -eq 'ConsoleHost') {
-    Import-Module -Name PSReadLine
+function Import-OptionalModule {
+    param (
+        [Parameter(Mandatory)]
+        [string] $Name
+    )
 
-    # Import-Module -Name Az.Tools.Predictor
-    # Enable-AzPredictor
-    Import-Module -Name CompletionPredictor
-    Set-PSReadLineOption -PredictionSource HistoryAndPlugin
-    Set-PSReadLineOption -PredictionViewStyle ListView
-    Set-PSReadLineOption -EditMode Windows
+    Import-Module -Name $Name -ErrorAction SilentlyContinue
+    $null -ne (Get-Module -Name $Name)
+}
 
-    Set-PSReadLineKeyHandler -Key Ctrl+Shift+l `
-        -BriefDescription ListCurrentDirectory `
-        -LongDescription 'List the current directory' `
-        -ScriptBlock {
-        [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
-        [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Get-ChildItem')
-        [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+function Invoke-CachedCompletionScript {
+    param (
+        [Parameter(Mandatory)]
+        [string] $Name,
+
+        [Parameter(Mandatory)]
+        [scriptblock] $Generator,
+
+        [TimeSpan] $MaxAge = [TimeSpan]::FromDays(7)
+    )
+
+    $cacheRoot = if ($env:LOCALAPPDATA) {
+        Join-Path -Path $env:LOCALAPPDATA -ChildPath 'PowerShell\CompletionCache'
+    }
+    else {
+        Join-Path -Path $HOME -ChildPath '.cache/powershell/completions'
     }
 
-    Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
+    $cachePath = Join-Path -Path $cacheRoot -ChildPath "$Name.ps1"
+    $cacheItem = Get-Item -LiteralPath $cachePath -ErrorAction SilentlyContinue
+    if ($null -eq $cacheItem -or ((Get-Date) - $cacheItem.LastWriteTime) -gt $MaxAge) {
+        New-Item -Path $cacheRoot -ItemType Directory -Force | Out-Null
+        $completionScript = try {
+            & $Generator 2>$null | Out-String
+        }
+        catch {
+            $null
+        }
+        if (-not [string]::IsNullOrWhiteSpace($completionScript)) {
+            Set-Content -LiteralPath $cachePath -Value $completionScript -Encoding utf8
+        }
+    }
+
+    if (Test-Path -LiteralPath $cachePath) {
+        . $cachePath
+    }
+}
+
+$script:IsInteractiveConsole = Test-InteractiveConsole
+$script:IsTerminalSession = $script:IsInteractiveConsole -and (
+    ($env:WT_SESSION -and $null -eq $env:TERM_PROGRAM) -or
+    $env:TERMINATOR_UUID -or
+    $env:GNOME_TERMINAL_SCREEN -or
+    ($env:TERM_PROGRAM -eq 'FluentTerminal') -or
+    ($env:TERM_PROGRAM -eq 'Apple_Terminal') -or
+    ($env:TERM_PROGRAM -eq 'iTerm.app')
+)
+
+if ($script:IsInteractiveConsole) {
+    if ((Import-OptionalModule -Name SecretManagementArgumentCompleter) -and (Get-Command -Name Import-SecretManagementArgumentCompleter -ErrorAction SilentlyContinue)) {
+        Import-SecretManagementArgumentCompleter
+    }
+
+    if (Import-OptionalModule -Name PSReadLine) {
+        # Import-Module -Name Az.Tools.Predictor
+        # Enable-AzPredictor
+        $predictionSource = if (Import-OptionalModule -Name CompletionPredictor) { 'HistoryAndPlugin' } else { 'History' }
+        try {
+            Set-PSReadLineOption -PredictionSource $predictionSource -ErrorAction Stop
+            Set-PSReadLineOption -PredictionViewStyle ListView -ErrorAction Stop
+        }
+        catch {
+            Set-PSReadLineOption -PredictionSource History -ErrorAction SilentlyContinue
+        }
+
+        Set-PSReadLineOption -EditMode Windows
+
+        Set-PSReadLineKeyHandler -Key Ctrl+Shift+l `
+            -BriefDescription ListCurrentDirectory `
+            -LongDescription 'List the current directory' `
+            -ScriptBlock {
+            [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
+            [Microsoft.PowerShell.PSConsoleReadLine]::Insert('Get-ChildItem')
+            [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+        }
+
+        Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
+    }
 
     [System.Console]::InputEncoding = [System.Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 }
 
-if (($env:WT_SESSION -and $null -eq $env:TERM_PROGRAM) -or $env:TERMINATOR_UUID -or $env:GNOME_TERMINAL_SCREEN -or ($env:TERM_PROGRAM -eq 'FluentTerminal') -or ($env:TERM_PROGRAM -eq 'Apple_Terminal') -or ($env:TERM_PROGRAM -eq 'iTerm.app')) {
-    Show-Calendar
-
+if ($script:IsTerminalSession) {
     # PowerShell parameter completion shim for the WinGet
-    Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
-        param($wordToComplete, $commandAst, $cursorPosition)
-        [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
-        $Local:word = $wordToComplete.Replace('"', '""')
-        $Local:ast = $commandAst.ToString().Replace('"', '""')
-        winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition | ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+    if (Get-Command -Name winget -ErrorAction SilentlyContinue) {
+        Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
+            param($wordToComplete, $commandAst, $cursorPosition)
+            [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
+            $Local:word = $wordToComplete.Replace('"', '""')
+            $Local:ast = $commandAst.ToString().Replace('"', '""')
+            winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+            }
         }
     }
 
-    # PowerShell parameter completion shim for the GitHub CLI
-    gh completion --shell powershell | Set-Variable -Name ghCompletion
+    if (Get-Command -Name gh -ErrorAction SilentlyContinue) {
+        Invoke-CachedCompletionScript -Name gh -Generator { gh completion --shell powershell }
+    }
 
-    $ghCompletion = $ghCompletion | ForEach-Object { Write-Output $_ } | Join-String -Separator ([System.Environment]::NewLine)
-    $ghCompletion = [scriptblock]::Create($ghCompletion)
-    Invoke-Command -ScriptBlock $ghCompletion
-
-    # Dapr CLI
-    $daprCliCompletion = dapr completion powershell | Join-String -Separator ([System.Environment]::NewLine)
-    $daprCliCompletion = [scriptblock]::Create($daprCliCompletion)
-    Invoke-Command -ScriptBlock $daprCliCompletion
+    if (Get-Command -Name dapr -ErrorAction SilentlyContinue) {
+        Invoke-CachedCompletionScript -Name dapr -Generator { dapr completion powershell }
+    }
 
     if (Get-Command rustup -ErrorAction Ignore) {
-        # PowerShell parameter completion shim for the Rustup
-        rustup completions powershell rustup | Set-Variable -Name rustupCompletion
-
-        $rustupCompletion = $rustupCompletion | ForEach-Object { Write-Output $_ } | Join-String -Separator ([System.Environment]::NewLine)
-        $rustupCompletion = [scriptblock]::Create($rustupCompletion)
-        Invoke-Command -ScriptBlock $rustupCompletion
-
-        # PowerShell parameter completion shim for the Cargo
-        rustup completions powershell cargo | Set-Variable -Name rustupCompletion
-
-        $rustupCompletion = $rustupCompletion | ForEach-Object { Write-Output $_ } | Join-String -Separator ([System.Environment]::NewLine)
-        $rustupCompletion = [scriptblock]::Create($rustupCompletion)
-        Invoke-Command -ScriptBlock $rustupCompletion
+        Invoke-CachedCompletionScript -Name rustup -Generator { rustup completions powershell rustup }
+        Invoke-CachedCompletionScript -Name cargo -Generator { rustup completions powershell cargo }
     }
 
     # PowerShell parameter completion shim for the dotnet CLI
-    Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
-        param($commandName, $wordToComplete, $cursorPosition)
-        dotnet complete --position $cursorPosition "$wordToComplete" | ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+    if (Get-Command -Name dotnet -ErrorAction SilentlyContinue) {
+        Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
+            param($commandName, $wordToComplete, $cursorPosition)
+            dotnet complete --position $cursorPosition "$wordToComplete" | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+            }
         }
     }
 
-    Register-ArgumentCompleter -Native -CommandName az -ScriptBlock {
-        param($commandName, $wordToComplete, $cursorPosition)
-        $completion_file = New-TemporaryFile
-        $env:ARGCOMPLETE_USE_TEMPFILES = 1
-        $env:_ARGCOMPLETE_STDOUT_FILENAME = $completion_file
-        $env:COMP_LINE = $wordToComplete
-        $env:COMP_POINT = $cursorPosition
-        $env:_ARGCOMPLETE = 1
-        $env:_ARGCOMPLETE_SUPPRESS_SPACE = 0
-        $env:_ARGCOMPLETE_IFS = "`n"
-        $env:_ARGCOMPLETE_SHELL = 'powershell'
-        az 2>&1 | Out-Null
-        Get-Content $completion_file | Sort-Object | ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+    if (Get-Command -Name az -ErrorAction SilentlyContinue) {
+        Register-ArgumentCompleter -Native -CommandName az -ScriptBlock {
+            param($commandName, $wordToComplete, $cursorPosition)
+            $completion_file = New-TemporaryFile
+            try {
+                $env:ARGCOMPLETE_USE_TEMPFILES = 1
+                $env:_ARGCOMPLETE_STDOUT_FILENAME = $completion_file
+                $env:COMP_LINE = $wordToComplete
+                $env:COMP_POINT = $cursorPosition
+                $env:_ARGCOMPLETE = 1
+                $env:_ARGCOMPLETE_SUPPRESS_SPACE = 0
+                $env:_ARGCOMPLETE_IFS = "`n"
+                $env:_ARGCOMPLETE_SHELL = 'powershell'
+                az 2>&1 | Out-Null
+                Get-Content $completion_file | Sort-Object | ForEach-Object {
+                    [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+                }
+            }
+            finally {
+                Remove-Item $completion_file, Env:\_ARGCOMPLETE_STDOUT_FILENAME, Env:\ARGCOMPLETE_USE_TEMPFILES, Env:\COMP_LINE, Env:\COMP_POINT, Env:\_ARGCOMPLETE, Env:\_ARGCOMPLETE_SUPPRESS_SPACE, Env:\_ARGCOMPLETE_IFS, Env:\_ARGCOMPLETE_SHELL -ErrorAction SilentlyContinue
+            }
         }
-        Remove-Item $completion_file, Env:\_ARGCOMPLETE_STDOUT_FILENAME, Env:\ARGCOMPLETE_USE_TEMPFILES, Env:\COMP_LINE, Env:\COMP_POINT, Env:\_ARGCOMPLETE, Env:\_ARGCOMPLETE_SUPPRESS_SPACE, Env:\_ARGCOMPLETE_IFS, Env:\_ARGCOMPLETE_SHELL
     }
 }
 
-Invoke-Expression (& { (zoxide init powershell | Out-String) })
+if ($script:IsInteractiveConsole -and (Get-Command -Name zoxide -ErrorAction SilentlyContinue)) {
+    Invoke-CachedCompletionScript -Name zoxide-init -MaxAge ([TimeSpan]::FromDays(30)) -Generator { zoxide init powershell }
+}
 
-if ($env:WT_PROFILE_ID -eq '{2595cd9c-8f05-55ff-a1d4-93f3041ca67f}') {
+if ($script:IsInteractiveConsole -and $env:WT_PROFILE_ID -eq '{2595cd9c-8f05-55ff-a1d4-93f3041ca67f}' -and (Get-Command -Name starship -ErrorAction SilentlyContinue)) {
     # PowerShell Preview
-    Invoke-Expression (&starship init powershell)
+    Invoke-CachedCompletionScript -Name starship-init -MaxAge ([TimeSpan]::FromDays(30)) -Generator { starship init powershell }
 }
-else {
+elseif ($script:IsInteractiveConsole -and (Get-Command -Name oh-my-posh -ErrorAction SilentlyContinue)) {
     if ($IsMacOS) {
-        $env:POSH_THEMES_PATH = "$(brew --prefix oh-my-posh)/themes"
-        $env:PATH += ':~/.aspire/bin'
-        $env:PATH += ':~/.local/bin'
+        if (Get-Command -Name brew -ErrorAction SilentlyContinue) {
+            $env:POSH_THEMES_PATH = "$(brew --prefix oh-my-posh)/themes"
+        }
+        $env:PATH += ":$HOME/.aspire/bin"
+        $env:PATH += ":$HOME/.local/bin"
     }
 
-    Copy-Item -Path $env:POSH_THEMES_PATH/powerlevel10k_rainbow.omp.json -Destination $HOME/theme.omp.json -Force
-    # Copy-Item -Path $env:POSH_THEMES_PATH/kushal.omp.json -Destination $HOME/theme.omp.json -Force
-    # Copy-Item -Path $env:POSH_THEMES_PATH/free-ukraine.omp.json -Destination $HOME/theme.omp.json -Force
-    $ompTheme = Get-Content -Path $HOME/theme.omp.json | ConvertFrom-Json -Depth 100
-    $timeSegment = $ompTheme.blocks | Select-Object -ExpandProperty segments | Where-Object { $PSItem.type -eq 'time' }
-    if ($null -eq $timeSegment.PSObject.Properties.Item('properties')) {
-        $timeSegment | Add-Member -MemberType NoteProperty -Name properties -Value @{
-            time_format = '3:04 PM'
+    $ompThemePath = if (Test-Path -LiteralPath (Join-Path -Path $HOME -ChildPath 'theme.omp.json')) {
+        Join-Path -Path $HOME -ChildPath 'theme.omp.json'
+    }
+    elseif ($env:POSH_THEMES_PATH) {
+        $themePath = Join-Path -Path $env:POSH_THEMES_PATH -ChildPath 'powerlevel10k_rainbow.omp.json'
+        if (Test-Path -LiteralPath $themePath) {
+            $themePath
         }
     }
-    elseif ($null -ne $timeSegment.properties.PSObject.Properties.Item('time_format')) {
-        $timeSegment.properties.time_format = $timeSegment.properties.time_format -replace '15:04:05', '3:04:05 PM'
-        $timeSegment.properties.time_format = $timeSegment.properties.time_format -replace '_2,15:04', '_2, 3:04 PM'
-        $timeSegment.properties.time_format = $timeSegment.properties.time_format -replace '15:04', '3:04 PM'
+
+    if ($ompThemePath) {
+        $ompCacheName = if ((Split-Path -Path $ompThemePath -Leaf) -eq 'theme.omp.json') { 'oh-my-posh-init-custom' } else { 'oh-my-posh-init-source' }
+        Invoke-CachedCompletionScript -Name $ompCacheName -MaxAge ([TimeSpan]::FromDays(30)) -Generator { oh-my-posh init pwsh --config $ompThemePath }
     }
-    $ompTheme.console_title_template = '{{ .Folder }}'
-    $ompTheme | ConvertTo-Json -Depth 100 | Set-Content -Path $HOME/theme.omp.json
-    oh-my-posh init pwsh --config $HOME/theme.omp.json | Invoke-Expression
+    else {
+        Invoke-CachedCompletionScript -Name oh-my-posh-init -MaxAge ([TimeSpan]::FromDays(30)) -Generator { oh-my-posh init pwsh }
+    }
 }

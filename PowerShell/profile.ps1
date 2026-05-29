@@ -1,15 +1,25 @@
-if ($IsWindows) {
-    Import-Module -Name Recycle
+$script:IsInteractiveSession = (
+    $Host.Name -ne 'ServerRemoteHost' -and
+    -not [System.Console]::IsInputRedirected -and
+    -not [System.Console]::IsOutputRedirected
+)
 
-    Set-Alias -Name trash -Value Remove-ItemSafely    
-}
-elseif ($IsMacOS) {
-    $env:PATH = "$env:PATH`:~/.local/share/powershell/Scripts"
-}
-elseif ($IsLinux) {
-    Get-Command -Name trash | Out-Null
+if ($script:IsInteractiveSession) {
+    if ($IsWindows) {
+        function trash {
+            [CmdletBinding(SupportsShouldProcess)]
+            param (
+                [Parameter(ValueFromRemainingArguments)]
+                [object[]] $Path
+            )
 
-    $env:PATH = "$env:PATH`:~/.local/share/powershell/Scripts"
+            Import-Module -Name Recycle -ErrorAction Stop
+            Remove-ItemSafely @Path
+        }
+    }
+    elseif ($IsMacOS -or $IsLinux) {
+        $env:PATH = "$env:PATH`:$HOME/.local/share/powershell/Scripts"
+    }
 }
 
 function quit() {
