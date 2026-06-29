@@ -9,12 +9,24 @@ if ($script:IsInteractiveSession) {
         function trash {
             [CmdletBinding(SupportsShouldProcess)]
             param (
-                [Parameter(ValueFromRemainingArguments)]
+                [Parameter(Mandatory, ValueFromRemainingArguments)]
                 [object[]] $Path
             )
 
-            Import-Module -Name Recycle -ErrorAction Stop
-            Remove-ItemSafely @Path
+            Add-Type -AssemblyName Microsoft.VisualBasic
+            foreach ($p in $Path) {
+                foreach ($resolved in (Resolve-Path $p)) {
+                    $full = $resolved.Path
+                    if ($PSCmdlet.ShouldProcess($Path, ("Deleting '{0}'" -f $full))) {
+                        if (Test-Path $full -PathType Container) {
+                            [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteDirectory($full, 'OnlyErrorDialogs', 'SendToRecycleBin')
+                        }
+                        else {
+                            [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile($full, 'OnlyErrorDialogs', 'SendToRecycleBin')
+                        }
+                    }
+                }
+            }
         }
     }
     elseif ($IsMacOS -or $IsLinux) {
